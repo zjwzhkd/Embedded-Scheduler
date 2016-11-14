@@ -30,7 +30,7 @@ typedef void * SchedHandle_t;
 
 /* 调度器事件 */
 typedef uint8_t  EvtPos_t;  /* 事件队列偏移类型 */
-typedef uint16_t EvtSig_t;  /* 事件信号数据类型 */
+typedef uint32_t EvtSig_t;  /* 事件信号数据类型 */
 typedef uint32_t EvtMsg_t;  /* 事件消息数据类型 */
 typedef struct sched_event
 {
