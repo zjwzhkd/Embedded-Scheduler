@@ -30,5 +30,10 @@
  * 1 - 使能调度器断言
  */
 #define SCHED_ASSERT_EN             ( 1 )
+/* 空闲任务Hook配置
+ * 0 - 禁止空闲任务Hook
+ * 1 - 使能空闲任务Hook
+ */
+#define SCHED_IDLE_HOOK_EN          ( 0 )
 
 #endif  /* __SCHED_CONFIG_H */
