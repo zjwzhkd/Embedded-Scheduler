@@ -7,6 +7,7 @@
 *******************************************************************************/
 
 #include "sched_proto.h"
+#include <stdlib.h>
 /*******************************************************************************
 
                                     底层接口
@@ -32,4 +33,35 @@ SchedEvent_t *schedPortEvtcpy(SchedEvent_t *dst, const SchedEvent_t *src)
     dst->sig = src->sig;
     dst->msg = src->msg;
     return (dst);
+}
+
+/**
+ * 事件块填充
+ *
+ * @param dst: 目标事件块指针
+ *
+ * @param sig: 事件信号
+ *
+ * @param msg: 事件消息
+ *
+ * @return: 目标事件块指针
+ */
+SchedEvent_t *schedPortEvtfill(SchedEvent_t *dst, EvtSig_t sig, EvtMsg_t msg)
+{
+    dst->sig = sig;
+    dst->msg = msg;
+    return (dst);
+}
+
+void *schedPortMalloc(size_t nsize)
+{
+void *ret = malloc(nsize);
+
+    SCHED_ASSERT(ret != NULL);
+    return (ret);
+}
+
+void schedPortFree(void *pv)
+{
+    free(pv);
 }
