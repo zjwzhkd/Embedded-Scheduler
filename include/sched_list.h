@@ -59,6 +59,20 @@ typedef struct sched_list
  */
 #define SCHED_LIST_NEXT(_pitem_)                ( (_pitem_)->next )
 
+/*
+ * 获取链表前一项
+ * _pitem_: 链表项指针
+ * return:  链表前一项指针
+ */
+#define SCHED_LIST_PREV(_pitem_)                ( (_pitem_)->prev )
+
+/*
+ * 判断是否为空链表
+ * _plist_: 链表指针
+ * return:  布尔值
+ */
+#define SCHED_LIST_IS_EMPTY(_plist_)            ( (_plist_)->next == (_plist_) )
+
 /* 操作函数 ------------------------------------------------------------------*/
 void schedIntListInit(sSchedList *list);
 void schedIntListInsert(sSchedList *list, sSchedList *item);
