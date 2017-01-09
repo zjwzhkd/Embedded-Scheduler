@@ -18,6 +18,8 @@
 #define SCHED_HEAP_SIZE             ( 1000 )
 /* 处理器字节对齐 */
 #define SCHED_BYTE_ALIGNMENT        ( CPU_BYTE_ALIGNMENT )
+/* 优先级记录表大小 */
+#define SCHED_PRIOTBL_TBL_SIZE      ( 3 )
 
 /* 调度器配置 ----------------------------------------------------------------*/
 /* 节拍大小配置
