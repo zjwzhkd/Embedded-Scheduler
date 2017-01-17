@@ -20,7 +20,8 @@ typedef struct sched_queue
     EvtPos_t            out;
     EvtPos_t            total;
     EvtPos_t            count;
-    SchedEvent_t        buf[];
+    size_t              esize;
+    uint8_t             buf[];
 } sSchedQueue;
 
 /* 宏定义 --------------------------------------------------------------------*/
@@ -39,11 +40,11 @@ typedef struct sched_queue
 #define SCHED_QUEUE_IS_FULL(_queue_)    ( (_queue_)->count == (_queue_)->total )
 
 /* 操作函数 ------------------------------------------------------------------*/
-sSchedQueue *schedIntQueueCreate(EvtPos_t nEvent);
+sSchedQueue *schedIntQueueCreate(EvtPos_t nMemb, size_t size);
 void schedIntQueueDelete(sSchedQueue *queue);
-eSchedBool schedIntQueueSend(sSchedQueue *queue, SchedEvent_t const *evt);
-eSchedBool schedIntQueueSendToFront(sSchedQueue *queue, SchedEvent_t const *evt);
-eSchedBool schedIntQueueReceive(sSchedQueue *queue, SchedEvent_t *evt);
+eSchedBool schedIntQueueSend(sSchedQueue *queue, const void *pItem);
+eSchedBool schedIntQueueSendToFront(sSchedQueue *queue, const void *pItem);
+eSchedBool schedIntQueueReceive(sSchedQueue *queue, void *buffer);
 eSchedBool schedIntQueueIsEmpty(sSchedQueue *queue);
 eSchedBool schedIntQueueIsFull(sSchedQueue *queue);
 
