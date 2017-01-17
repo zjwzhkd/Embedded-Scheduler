@@ -122,7 +122,7 @@ uint8_t prio;
 uint8_t x,y;
 
     y = priotbl_unmap[priotbl->grp];
-    SCHED_ASSERT(y <= SCHED_PRIOTBL_TBL_SIZE);
+    SCHED_ASSERT(y < SCHED_PRIOTBL_TBL_SIZE);
     SCHED_ASSERT(priotbl->tbl[y] > 0);
     x = priotbl_unmap[priotbl->tbl[y]];
     prio = (y<<3) + x;
