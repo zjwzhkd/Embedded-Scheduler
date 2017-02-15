@@ -12,17 +12,55 @@
 /* 头文件 --------------------------------------------------------------------*/
 #include "cpu.h"
 
-/* 数据类型 ------------------------------------------------------------------*/
+/* 接口数据类型 --------------------------------------------------------------*/
 /* 架构基本类型 */
 typedef base_t SchedBase_t;
 
 /* CPU状态类型 */
 typedef cpu_t  SchedCPU_t;
 
-/* 调度器事件 */
-typedef uint8_t  EvtPos_t;  /* 事件队列偏移类型 */
-typedef uint32_t EvtSig_t;  /* 事件信号数据类型 */
-typedef uint32_t EvtMsg_t;  /* 事件消息数据类型 */
+/* 节拍计数类型 */
+#if SCHED_16BIT_TICK_EN
+    typedef uint16_t SchedTick_t;
+    #define SCHED_TICK_MAX  ( (SchedTick_t)0xFFFF )
+#else
+    typedef uint32_t SchedTick_t;
+    #define SCHED_TICK_MAX  ( (SchedTick_t)0xFFFFFFFF )
+#endif
+
+/* 事件数据类型 --------------------------------------------------------------*/
+/* 事件队列偏移类型 */
+#if   SCHED_EVTPOS_TYPE == 0
+    typedef uint8_t     EvtPos_t;
+#elif SCHED_EVTPOS_TYPE == 1
+    typedef size_t      EvtPos_t;
+#else
+    #error config 'SCHED_EVTPOS_TYPE' is error.
+#endif
+
+/* 事件信号变量类型 */
+#if   SCHED_EVTSIG_TYPE == 0
+    typedef uint8_t     EvtSig_t;
+#elif SCHED_EVTSIG_TYPE == 1
+    typedef uint16_t    EvtSig_t;
+#elif SCHED_EVTSIG_TYPE == 2
+    typedef uint32_t    EvtSig_t;
+#else
+    #error config 'SCHED_EVTSIG_TYPE' is error.
+#endif
+
+/* 事件消息变量类型 */
+#if   SCHED_EVTMSG_TYPE == 0
+    typedef uint8_t     EvtMsg_t;
+#elif SCHED_EVTMSG_TYPE == 1
+    typedef uint16_t    EvtMsg_t;
+#elif SCHED_EVTMSG_TYPE == 2
+    typedef uint32_t    EvtMsg_t;
+#else
+    #error config 'SCHED_EVTMSG_TYPE' is error.
+#endif
+
+/* 调度器事件变量类型 */
 typedef struct sched_event
 {
     EvtSig_t        sig;
