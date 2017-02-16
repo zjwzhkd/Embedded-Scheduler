@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "sched_config.h"
-#include "sched_port.h"
+#include "sched_portable.h"
 
 /* 调度器数据类型 ------------------------------------------------------------*/
 
