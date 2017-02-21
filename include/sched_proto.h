@@ -13,17 +13,9 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "sched_config.h"
-#include "sched_port.h"
+#include "sched_portable.h"
 
 /* 调度器数据类型 ------------------------------------------------------------*/
-/* 调度器节拍 */
-#if SCHED_16BIT_TICK_EN
-    typedef uint16_t SchedTick_t;
-    #define SCHED_TICK_MAX  ( (SchedTick_t)0xFFFF )
-#else
-    typedef uint32_t SchedTick_t;
-    #define SCHED_TICK_MAX  ( (SchedTick_t)0xFFFFFFFF )
-#endif
 
 /* 调度器任务优先级 */
 typedef SchedTick_t SchedPrio_t;
