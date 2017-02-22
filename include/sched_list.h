@@ -36,7 +36,7 @@ typedef struct sched_list
  * return:   结构体指针
  */
 #define SCHED_LIST_ENTRY(_pitem_, _type_, _member_) \
-    container(_pitem_, _type_, _member_)
+    container_of(_pitem_, _type_, _member_)
 
 /*
  * 设置链表项排序值
