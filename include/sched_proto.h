@@ -41,6 +41,8 @@ typedef enum
     SCHED_ERR_HANDLE_NULL,
     SCHED_ERR_PARAM,
     SCHED_ERR_CREATE_FAILED,
+    /* 核心状态错误代码 */
+    SCHED_ERR_CORE_STATE,
     /* 未知错误代码 */
     SCHED_ERR_UNKNOWN
 } eSchedError;
