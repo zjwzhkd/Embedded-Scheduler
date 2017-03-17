@@ -43,6 +43,8 @@ typedef enum
     SCHED_ERR_CREATE_FAILED,
     /* 核心状态错误代码 */
     SCHED_ERR_CORE_STATE,
+    /* 事件错误代码 */
+    SCHED_ERR_EVENT_SEND_FAILED,
     /* 未知错误代码 */
     SCHED_ERR_UNKNOWN
 } eSchedError;
