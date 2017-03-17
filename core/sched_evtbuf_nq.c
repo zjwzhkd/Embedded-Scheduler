@@ -59,7 +59,6 @@ void schedEvtbufDelete(sSchedEvtbuf *evtbuf)
 /* 事件发送至缓存区末端 */
 eSchedBool schedEvtbufSend(sSchedEvtbuf *evtbuf, const SchedEvent_t *tx_evt)
 {
-    SCHED_ASSERT(evtbuf != NULL);
     SCHED_ASSERT(tx_evt->sig >= SCHED_SIG_USER);
     SCHED_ASSERT(tx_evt->msg == 0);
 
@@ -78,8 +77,6 @@ eSchedBool schedEvtbufReceive(sSchedEvtbuf *evtbuf, SchedEvent_t *rx_evt)
 {
 uint8_t sig;
 
-    SCHED_ASSERT(evtbuf != NULL);
-
     if ( SCHED_PRIOTBL_IS_EMPTY(&evtbuf->tbl) )
     {
         return (SCHED_FALSE);
@@ -97,8 +94,6 @@ uint8_t sig;
 /* 判断事件缓存区是否空 */
 eSchedBool schedEvtbufIsEmpty(sSchedEvtbuf *evtbuf)
 {
-    SCHED_ASSERT(evtbuf != NULL);
-
     if ( SCHED_PRIOTBL_IS_EMPTY(&evtbuf->tbl) )
     {
         return (SCHED_TRUE);

@@ -99,7 +99,6 @@ eSchedBool schedEvtbufSend(sSchedEvtbuf *evtbuf, const SchedEvent_t *tx_evt)
 {
 eSchedBool ret;
 
-    SCHED_ASSERT(evtbuf != NULL);
     SCHED_ASSERT(tx_evt->sig >= SCHED_SIG_USER);
 
     if (evtbuf->len == 0)
@@ -123,7 +122,6 @@ eSchedBool schedEvtbufSendToFront(sSchedEvtbuf *evtbuf, const SchedEvent_t *tx_e
 {
 eSchedBool ret;
 
-    SCHED_ASSERT(evtbuf != NULL);
     SCHED_ASSERT(tx_evt->sig >= SCHED_SIG_USER);
 
     if (evtbuf->len == 0)
@@ -147,8 +145,6 @@ eSchedBool schedEvtbufReceive(sSchedEvtbuf *evtbuf, SchedEvent_t *rx_evt)
 {
 eSchedBool ret;
 uint8_t sig;
-
-    SCHED_ASSERT(evtbuf != NULL);
 
     if (evtbuf->len == 0)
     {
@@ -179,8 +175,6 @@ uint8_t sig;
 eSchedBool schedEvtbufIsEmpty(sSchedEvtbuf *evtbuf)
 {
 eSchedBool ret;
-
-    SCHED_ASSERT(evtbuf != NULL);
 
     if (evtbuf->len == 0)
     {
