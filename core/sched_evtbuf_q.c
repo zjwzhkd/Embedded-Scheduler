@@ -11,86 +11,59 @@
 
 #if SCHED_EVTBUF_QUEUE_EN
 
-#include "sched_priotbl.h"
-#include "sched_queue.h"
-/*******************************************************************************
-
-                                  事件缓存定义
-
-*******************************************************************************/
-struct sched_evtbuf
-{
-    EvtPos_t            len;
-    union {
-        sSchedPriotbl   *tbl;
-        sSchedQueue     *queue;
-    } p;
-};
-
 /*******************************************************************************
 
                                   事件缓存管理
 
 *******************************************************************************/
 /**
- * 创建事件缓存区, 支持使用事件队列或者优先级记录表记录事件,
+ * 初始化事件缓存区, 支持使用事件队列或者优先级记录表记录事件,
  * 若使用优先级记录表记录事件, 则忽略事件的消息
+ *
+ * @param evtbuf: 事件缓存区指针
  *
  * @param len: 事件队列的长度, 若设置为0, 使用优先级记录表记录事件
  *
- * @return: 创建成功返回事件缓存区指针, 创建失败返回NULL
+ * @return: 布尔值, 初始化成功返回SCHED_TRUE, 初始化失败返回SCHED_FALSE
  */
-sSchedEvtbuf *schedEvtbufCreate(EvtPos_t len)
+eSchedBool schedEvtbufInit(sSchedEvtbuf *evtbuf, EvtPos_t len)
 {
-sSchedEvtbuf *pCreatedEvtbuf = NULL;
+eSchedBool ret = SCHED_FALSE;
 
-    pCreatedEvtbuf = (sSchedEvtbuf *)schedPortMalloc(sizeof(sSchedEvtbuf));
-    if (pCreatedEvtbuf != NULL)
+    evtbuf->len = len;
+    if ( len == 0 )
     {
-        pCreatedEvtbuf->len = len;
-        if ( len == 0 )
+        /* 使用优先级记录表 */
+        evtbuf->p.tbl = (sSchedPriotbl *)schedPortMalloc(sizeof(sSchedPriotbl));
+        if (evtbuf->p.tbl != NULL)
         {
-            /* 使用优先级记录表 */
-            pCreatedEvtbuf->p.tbl = (sSchedPriotbl *)schedPortMalloc(sizeof(sSchedPriotbl));
-            if (pCreatedEvtbuf->p.tbl != NULL)
-            {
-                schedIntPriotblInit(pCreatedEvtbuf->p.tbl);
-            }
-            else
-            {
-                schedPortFree(pCreatedEvtbuf);
-                pCreatedEvtbuf = NULL;
-            }
+            schedIntPriotblInit(evtbuf->p.tbl);
+            ret = SCHED_TRUE;
         }
-        else
+    }
+    else
+    {
+        /* 使用事件队列 */
+        evtbuf->p.queue = schedIntQueueCreate(len, sizeof(SchedEvent_t));
+        if (evtbuf->p.queue != NULL)
         {
-            /* 使用事件队列 */
-            pCreatedEvtbuf->p.queue = schedIntQueueCreate(len, sizeof(SchedEvent_t));
-            if (pCreatedEvtbuf->p.queue == NULL)
-            {
-                schedPortFree(pCreatedEvtbuf);
-                pCreatedEvtbuf = NULL;
-            }
+            ret = SCHED_TRUE;
         }
     }
 
-    return (pCreatedEvtbuf);
+    return (ret);
 }
 
-/* 删除事件缓存区 */
-void schedEvtbufDelete(sSchedEvtbuf *evtbuf)
+/* 释放事件缓存区资源 */
+void schedEvtbufRelease(sSchedEvtbuf *evtbuf)
 {
-    if (evtbuf != NULL)
+    if (evtbuf->len == 0)
     {
-        if (evtbuf->len == 0)
-        {
-            schedPortFree(evtbuf->p.tbl);
-        }
-        else
-        {
-            schedIntQueueDelete(evtbuf->p.queue);
-        }
-        schedPortFree(evtbuf);
+        schedPortFree(evtbuf->p.tbl);
+    }
+    else
+    {
+        schedIntQueueDelete(evtbuf->p.queue);
     }
 }
 

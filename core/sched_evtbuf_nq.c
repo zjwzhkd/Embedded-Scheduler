@@ -11,49 +11,30 @@
 
 #if SCHED_EVTBUF_QUEUE_EN == 0
 
-#include "sched_priotbl.h"
-/*******************************************************************************
-
-                                  事件缓存定义
-
-*******************************************************************************/
-struct sched_evtbuf
-{
-    sSchedPriotbl   tbl;
-};
-
 /*******************************************************************************
 
                                   事件缓存管理
 
 *******************************************************************************/
 /**
- * 创建事件缓存区, 使用优先级记录表记录事件的信号, 忽略事件的消息
+ * 初始化事件缓存区, 使用优先级记录表记录事件的信号, 并忽略事件的消息
  *
- * @param len: 事件队列的长度, 必须设置为0, 否则事件缓存区将创建失败
+ * @param evtbuf: 事件缓存区指针
  *
- * @return: 创建成功返回事件缓存区指针, 创建失败返回NULL
+ * @param len: 事件队列的长度, 强制设置为0
+ *
+ * @return: 布尔值, 初始化成功返回SCHED_TRUE, 初始化失败返回SCHED_FALSE
  */
-sSchedEvtbuf *schedEvtbufCreate(EvtPos_t len)
+eSchedBool schedEvtbufInit(sSchedEvtbuf *evtbuf, EvtPos_t len)
 {
-sSchedEvtbuf *pCreatedEvtbuf = NULL;
-
-    if (len == 0)
-    {
-        pCreatedEvtbuf = (sSchedEvtbuf *)schedPortMalloc(sizeof(sSchedEvtbuf));
-        if (pCreatedEvtbuf != NULL)
-        {
-            schedIntPriotblInit(&pCreatedEvtbuf->tbl);
-        }
-    }
-
-    return (pCreatedEvtbuf);
+    schedIntPriotblInit(&evtbuf->tbl);
+    return (SCHED_TRUE);
 }
 
-/* 删除事件缓存区 */
-void schedEvtbufDelete(sSchedEvtbuf *evtbuf)
+/* 释放事件缓存区资源 */
+void schedEvtbufRelease(sSchedEvtbuf *evtbuf)
 {
-    schedPortFree(evtbuf);
+    ((void) evtbuf);
 }
 
 /* 事件发送至缓存区末端 */
