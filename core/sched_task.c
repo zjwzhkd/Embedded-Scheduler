@@ -24,7 +24,7 @@ typedef struct sched_task
 
     sSchedFSM               fsm;
     sSchedList              prio;
-    sSchedEvtbuf            *evtbuf;
+    sSchedEvtbuf            evtbuf;
 } sSchedTask;
 
 /*******************************************************************************
@@ -99,6 +99,7 @@ eSchedError schedTaskCreate(SchedPrio_t             prio,
                             SchedHandle_t * const   phCreatedTask)
 {
 sSchedTask *pCreatedTask = NULL;
+eSchedBool evtbuf_init;
 
     /* 当调度器处于停止状态时, 允许创建新任务 */
     if ( !SCHED_CORE_IS_STOPPED() )
@@ -114,8 +115,8 @@ sSchedTask *pCreatedTask = NULL;
         schedFSMCtor(&pCreatedTask->fsm, initial);
         schedIntListInit(&pCreatedTask->prio);
         SCHED_LIST_SET_VALUE(&pCreatedTask->prio, prio);
-        pCreatedTask->evtbuf = schedEvtbufCreate(eventLen);
-        if (pCreatedTask->evtbuf == NULL)
+        evtbuf_init = schedEvtbufInit(&pCreatedTask->evtbuf, eventLen);
+        if ( evtbuf_init == SCHED_FALSE )
         {
             schedPortFree(pCreatedTask);
             pCreatedTask = NULL;
@@ -173,13 +174,12 @@ SchedCPU_t cpu_sr;
         return (SCHED_ERR_HANDLE_NULL);
     }
     SCHED_BASE_OBJ_ASSERT(hTask, SCHED_OBJ_TASK);
-    SCHED_ASSERT(pTask->evtbuf != NULL);
 
     event.sig = sig;
     event.msg = msg;
     cpu_sr = SCHED_EnterCritical();
     {
-        tx_ret = schedEvtbufSend(pTask->evtbuf, &event);
+        tx_ret = schedEvtbufSend(&pTask->evtbuf, &event);
         if ( tx_ret )
         {
             RECORD_READY_TASK(pTask);
@@ -230,13 +230,12 @@ SchedCPU_t cpu_sr;
         return (SCHED_ERR_HANDLE_NULL);
     }
     SCHED_BASE_OBJ_ASSERT(hTask, SCHED_OBJ_TASK);
-    SCHED_ASSERT(pTask->evtbuf != NULL);
 
     event.sig = sig;
     event.msg = msg;
     cpu_sr = SCHED_EnterCritical();
     {
-        tx_ret = schedEvtbufSendToFront(pTask->evtbuf, &event);
+        tx_ret = schedEvtbufSendToFront(&pTask->evtbuf, &event);
         if ( tx_ret )
         {
             RECORD_READY_TASK(pTask);
@@ -287,13 +286,12 @@ SchedCPU_t cpu_sr;
         return (SCHED_ERR_HANDLE_NULL);
     }
     SCHED_BASE_OBJ_ASSERT(hTask, SCHED_OBJ_TASK);
-    SCHED_ASSERT(pTask->evtbuf != NULL);
 
     event.sig = sig;
     event.msg = msg;
     cpu_sr = SCHED_EnterCriticalFromISR();
     {
-        tx_ret = schedEvtbufSend(pTask->evtbuf, &event);
+        tx_ret = schedEvtbufSend(&pTask->evtbuf, &event);
         if ( tx_ret )
         {
             RECORD_READY_TASK(pTask);
@@ -344,13 +342,12 @@ SchedCPU_t cpu_sr;
         return (SCHED_ERR_HANDLE_NULL);
     }
     SCHED_BASE_OBJ_ASSERT(hTask, SCHED_OBJ_TASK);
-    SCHED_ASSERT(pTask->evtbuf != NULL);
 
     event.sig = sig;
     event.msg = msg;
     cpu_sr = SCHED_EnterCriticalFromISR();
     {
-        tx_ret = schedEvtbufSendToFront(pTask->evtbuf, &event);
+        tx_ret = schedEvtbufSendToFront(&pTask->evtbuf, &event);
         if ( tx_ret )
         {
             RECORD_READY_TASK(pTask);
@@ -413,9 +410,8 @@ SchedEvent_t event;
         if ( READY_TASK_IS_EXISTING() )
         {
             GET_READY_TASK(task);
-            SCHED_ASSERT(task->evtbuf != NULL);
             task_ready = SCHED_TRUE;
-            task_exec  = schedEvtbufReceive(task->evtbuf, &event);
+            task_exec  = schedEvtbufReceive(&task->evtbuf, &event);
         }
     }
     SCHED_ExitCritical(cpu_sr);
@@ -432,7 +428,7 @@ SchedEvent_t event;
         cpu_sr = SCHED_EnterCritical();
         {
             RESET_READY_TASK(task);
-            if ( !schedEvtbufIsEmpty(task->evtbuf) )
+            if ( !schedEvtbufIsEmpty(&task->evtbuf) )
             {
                 RECORD_READY_TASK(task);
             }
