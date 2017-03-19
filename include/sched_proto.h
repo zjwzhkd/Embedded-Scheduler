@@ -49,6 +49,21 @@ typedef enum
     SCHED_ERR_UNKNOWN
 } eSchedError;
 
+/* 定时器运行模式 */
+typedef enum
+{
+    SCHED_TIMER_ONCE = 0,       /* 定时器单次运行模式 */
+    SCHED_TIMER_RELOAD          /* 定时器自动重载模式 */
+} eSchedTimerMode;
+
+/* 定时器状态 */
+typedef enum
+{
+    SCHED_TIMER_RESET = 0,      /* 定时器复位状态 */
+    SCHED_TIMER_RUNNING,        /* 定时器运行状态 */
+    SCHED_TIMER_ARRIVAL         /* 定时器到达状态 */
+} eSchedTimerStatus;
+
 /* 内部信号 */
 enum {
     SCHED_SIG_EMPTY = 0,        /* 初始化空信号 */
