@@ -36,7 +36,15 @@ typedef struct sched_list
  * return:   结构体指针
  */
 #define SCHED_LIST_ENTRY(_pitem_, _type_, _member_) \
-    container(_pitem_, _type_, _member_)
+    container_of(_pitem_, _type_, _member_)
+
+/*
+ * 遍历指定链表
+ * _pos_:  遍历链表项指针
+ * _head_: 链表头结点指针
+ */
+#define SCHED_LIST_FOR_EACH(_pos_, _head_)  \
+    for (_pos_ = (_head_)->next; _pos_ != (_head_); _pos_ = _pos_->next)
 
 /*
  * 设置链表项排序值
