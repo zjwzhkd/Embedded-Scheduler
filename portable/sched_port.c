@@ -7,7 +7,6 @@
 *******************************************************************************/
 
 #include "sched_proto.h"
-#include <stdlib.h>
 /*******************************************************************************
 
                                     底层接口
@@ -17,17 +16,4 @@
 void schedPortInit(void)
 {
 
-}
-
-void *schedPortMalloc(size_t nsize)
-{
-void *ret = malloc(nsize);
-
-    SCHED_ASSERT(ret != NULL);
-    return (ret);
-}
-
-void schedPortFree(void *pv)
-{
-    free(pv);
 }
