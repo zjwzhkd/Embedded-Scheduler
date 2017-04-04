@@ -92,10 +92,6 @@ typedef struct sched_event
 /* 底层初始化函数 ------------------------------------------------------------*/
 void schedPortInit(void);
 
-/* 事件复制函数 --------------------------------------------------------------*/
-SchedEvent_t *schedPortEvtcpy(SchedEvent_t *dst, SchedEvent_t const *src);
-SchedEvent_t *schedPortEvtfill(SchedEvent_t *dst, EvtSig_t sig, EvtMsg_t msg);
-
 /* 内存分配函数 --------------------------------------------------------------*/
 void *schedPortMalloc(size_t nsize);
 void schedPortFree(void *pv);
