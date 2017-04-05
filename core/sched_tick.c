@@ -8,6 +8,7 @@
 
 #include "sched_tick.h"
 #include "sched_core.h"
+#include "sched_api.h"
 /*******************************************************************************
 
                                     全局变量

@@ -11,6 +11,7 @@
 #include "sched_core.h"
 #include "sched_tick.h"
 #include "sched_task.h"
+#include "sched_api.h"
 /*******************************************************************************
 
                                  定时器类型定义

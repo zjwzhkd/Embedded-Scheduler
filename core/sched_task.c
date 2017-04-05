@@ -12,7 +12,7 @@
 #include "sched_list.h"
 #include "sched_core.h"
 #include "sched_evtbuf.h"
-
+#include "sched_api.h"
 /*******************************************************************************
 
                                   任务类型定义
