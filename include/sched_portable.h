@@ -93,6 +93,7 @@ typedef struct sched_event
 void schedPortInit(void);
 
 /* 内存分配函数 --------------------------------------------------------------*/
+void schedPortHeapInit(void);
 void *schedPortMalloc(size_t nsize);
 void schedPortFree(void *pv);
 

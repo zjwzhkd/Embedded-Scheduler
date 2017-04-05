@@ -9,6 +9,11 @@
 #include "sched_proto.h"
 #include <stdlib.h>
 
+void schedPortHeapInit(void)
+{
+
+}
+
 void *schedPortMalloc(size_t nsize)
 {
 void *ret = malloc(nsize);

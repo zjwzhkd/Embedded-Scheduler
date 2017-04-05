@@ -15,5 +15,5 @@
 /* 调度器底层初始化 */
 void schedPortInit(void)
 {
-
+    schedPortHeapInit();
 }
