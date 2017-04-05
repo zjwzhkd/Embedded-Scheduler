@@ -81,4 +81,11 @@ eSchedError schedTimerChangePeriod(SchedHandle_t hTimer, SchedTick_t period);
 
 eSchedTimerStatus schedTimerGetStatus(SchedHandle_t hTimer);
 
+/*******************************************************************************
+
+                                    HOOK函数
+
+*******************************************************************************/
+extern void schedIdleHook(void);
+
 #endif  /* __SCHED_API_H */

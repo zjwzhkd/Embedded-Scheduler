@@ -9,6 +9,7 @@
 #include "sched_core.h"
 #include "sched_task.h"
 #include "sched_tick.h"
+#include "sched_api.h"
 /*******************************************************************************
 
                                     全局变量
@@ -43,7 +44,9 @@ eSchedBool exec;
         exec = schedTaskExecute();
         if ( exec == SCHED_FALSE )
         {
-
+        #if SCHED_IDLE_HOOK_EN
+            schedIdleHook();
+        #endif
         }
     }
 }
