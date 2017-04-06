@@ -87,5 +87,6 @@ eSchedTimerStatus schedTimerGetStatus(SchedHandle_t hTimer);
 
 *******************************************************************************/
 extern void schedIdleHook(void);
+extern void schedLoopHook(void);
 
 #endif  /* __SCHED_API_H */

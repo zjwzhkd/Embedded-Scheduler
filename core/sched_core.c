@@ -41,6 +41,9 @@ eSchedBool exec;
 
     for (;;)
     {
+    #if SCHED_LOOP_HOOK_EN
+        schedLoopHook();
+    #endif
         exec = schedTaskExecute();
         if ( exec == SCHED_FALSE )
         {
