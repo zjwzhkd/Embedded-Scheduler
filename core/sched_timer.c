@@ -139,10 +139,12 @@ sSchedTimer *pTimer = (sSchedTimer *)hTimer;
 SchedCPU_t  cpu_sr;
 
     /* 检测调度器是否处于运行状态 */
+    /*
     if ( !SCHED_CORE_IS_RUNNING() )
     {
         return (SCHED_ERR_CORE_STATE);
     }
+    */
 
     /* 检测定时器句柄有效性 */
     if ( hTimer == NULL )
@@ -176,10 +178,12 @@ sSchedTimer *pTimer = (sSchedTimer *)hTimer;
 SchedCPU_t  cpu_sr;
 
     /* 检测调度器是否处于运行状态 */
+    /*
     if ( !SCHED_CORE_IS_RUNNING() )
     {
         return (SCHED_ERR_CORE_STATE);
     }
+    */
 
     /* 检测定时器句柄有效性 */
     if ( hTimer == NULL )
