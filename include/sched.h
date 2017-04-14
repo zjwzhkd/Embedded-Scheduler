@@ -11,5 +11,6 @@
 
 #include "sched_proto.h"
 #include "sched_api.h"
+#include "sched_ex_gui.h"
 
 #endif  /* __SCHED_H */
