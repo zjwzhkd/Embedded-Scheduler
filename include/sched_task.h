@@ -28,6 +28,7 @@ eSchedError schedEventSendToFrontFromISR(SchedHandle_t hTask, EvtSig_t sig, EvtM
 void schedTaskInit(void);
 void schedTaskInitialiseAll(void);
 eSchedBool schedTaskExecute(void);
+eSchedBool schedHasReadyTask(void);
 SchedBase_t schedStateTransfer(SchedHandle_t hTask, SchedEventHandler target);
 
 #endif  /* __SCHED_TASK_H */

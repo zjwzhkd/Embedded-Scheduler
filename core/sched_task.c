@@ -439,6 +439,24 @@ SchedEvent_t event;
     return (task_ready);
 }
 
+/* 当前是否存在就绪任务 */
+eSchedBool schedHasReadyTask(void)
+{
+eSchedBool task_ready = SCHED_FALSE;
+SchedCPU_t cpu_sr;
+
+    cpu_sr = SCHED_EnterCritical();
+    {
+        if ( READY_TASK_IS_EXISTING() )
+        {
+            task_ready = SCHED_TRUE;
+        }
+    }
+    SCHED_ExitCritical(cpu_sr);
+
+    return (task_ready);
+}
+
 /* 设置状态转移目标 */
 SchedBase_t schedStateTransfer(SchedHandle_t hTask, SchedEventHandler target)
 {

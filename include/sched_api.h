@@ -18,6 +18,7 @@
 void schedInit(void);
 void schedStart(void);
 void schedTickHandler(void);
+eSchedBool schedHasReadyTask(void);
 
 /*******************************************************************************
 
