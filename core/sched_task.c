@@ -401,7 +401,7 @@ eSchedBool schedTaskExecute(void)
 eSchedBool task_ready = SCHED_FALSE;
 eSchedBool task_exec  = SCHED_FALSE;
 SchedCPU_t cpu_sr;
-sSchedTask *task;
+sSchedTask *task = NULL;
 SchedEvent_t event;
 
     /* 获取就绪任务以及事件请求 */
