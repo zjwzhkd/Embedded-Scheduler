@@ -53,30 +53,6 @@ eSchedError ret_err = SCHED_OK;
 }
 
 /**
- * 初始化视图控制器
- *
- * @param pView: 待初始化的视图结构体指针
- *
- * @param pViewPhy: 视图实现接口结构体指针
- *
- * @param scanPeriod: 动作扫描周期
- *
- * @param updatePeriod: 视图更新周期
- *
- * @return: 若视图控制器初始化成功, 返回SCHED_OK
- */
-eSchedError schedExViewInit(sSchedView              *pView,
-                            sSchedViewPhy const     *pViewPhy,
-                            SchedTick_t             scanPeriod,
-                            SchedTick_t             updatePeriod)
-{
-    pView->phy          = pViewPhy;
-    pView->scanPeriod   = scanPeriod;
-    pView->updatePeriod = updatePeriod;
-    return (SCHED_OK);
-}
-
-/**
  * GUI任务初始化状态的实现函数
  *
  * @param pGUI: GUI控制器指针
@@ -122,9 +98,9 @@ eSchedError err;
     /* 状态初始化信号 */
     case SCHED_SIG_ENTRY:
     {
-        err = schedTimerChangePeriod(pGUI->hScanTimer, pView->scanPeriod);
+        err = schedTimerChangePeriod(pGUI->hScanTimer, pView->phy->scanPeriod);
         SCHED_ASSERT(err == SCHED_OK);
-        err = schedTimerChangePeriod(pGUI->hUpdateTimer, pView->updatePeriod);
+        err = schedTimerChangePeriod(pGUI->hUpdateTimer, pView->phy->updatePeriod);
         SCHED_ASSERT(err == SCHED_OK);
         err = schedTimerStart(pGUI->hScanTimer);
         SCHED_ASSERT(err == SCHED_OK);

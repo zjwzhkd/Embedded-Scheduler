@@ -29,13 +29,15 @@ struct sched_gui
 struct sched_view
 {
     sSchedViewPhy const         *phy;               /* 视图实现接口 */
-    SchedTick_t                 scanPeriod;         /* 动作扫描周期 */
-    SchedTick_t                 updatePeriod;       /* 视图更新周期 */
 };
 
 /* 视图实现接口 */
 struct sched_view_phy
 {
+    /* 动作扫描周期 */
+    SchedTick_t                 scanPeriod;
+    /* 定时更新周期 */
+    SchedTick_t                 updatePeriod;
     /* 状态处理函数 */
     SchedEventHandler           ViewStateHandler;
     /* 用户自定义事件处理函数 */
@@ -91,36 +93,37 @@ enum {
 };
 
 /* GUI宏定义 -----------------------------------------------------------------*/
-#define __SCHED_VIEW_DEFINE(_view_, _phy_, _scan_, _update_)    \
+#define __SCHED_VIEW_DEFINE(_view_, _phy_)  \
     sSchedView _view_ =                     \
     {                                       \
         .phy          = (_phy_),            \
-        .scanPeriod   = (_scan_),           \
-        .updatePeriod = (_update_)          \
     }
 
-#define __SCHED_VIEW_PHY_DEFINE(_phy_, _state_, _user_, _init_, _exit_, _update_, _display_, _scan_, _action_)  \
-    sSchedViewPhy _phy_   =                 \
-    {                                       \
-        .ViewStateHandler = (_state_),      \
-        .UserEventHandler = (_user_),       \
-        .Init             = (_init_),       \
-        .Exit             = (_exit_),       \
-        .Update           = (_update_),     \
-        .Display          = (_display_),    \
-        .Scan             = (_scan_),       \
-        .Action           = (_action_)      \
+#define __SCHED_VIEW_PHY_DEFINE(_phy_, _scanPeriod_, _updatePeriod_,    \
+        _state_, _user_, _init_, _exit_, _update_, _display_, _scan_, _action_) \
+    sSchedViewPhy _phy_   =                     \
+    {                                           \
+        .scanPeriod       = (_scanPeriod_),     \
+        .updatePeriod     = (_updatePeriod_),   \
+        .ViewStateHandler = (_state_),          \
+        .UserEventHandler = (_user_),           \
+        .Init             = (_init_),           \
+        .Exit             = (_exit_),           \
+        .Update           = (_update_),         \
+        .Display          = (_display_),        \
+        .Scan             = (_scan_),           \
+        .Action           = (_action_)          \
     }
 
 #define __SCHED_VIEW_PHY(_view_)            _view_##__phy
 
 /* 视图结构体定义 */
 #define SCHED_VIEW_DEFINE(_view_, _scanPeriod_, _updatePeriod_, \
-        _state_, _user_, _init_, _exit_, _update_, _display_, _scan_, _action_)         \
-                                                                                        \
-    static const __SCHED_VIEW_PHY_DEFINE(__SCHED_VIEW_PHY(_view_), _state_,             \
-        _user_, _init_, _exit_, _update_, _display_, _scan_, _action_);                 \
-    __SCHED_VIEW_DEFINE(_view_, &__SCHED_VIEW_PHY(_view_), _scanPeriod_, _updatePeriod_)
+        _state_, _user_, _init_, _exit_, _update_, _display_, _scan_, _action_) \
+                                                                                                    \
+    static const __SCHED_VIEW_PHY_DEFINE(__SCHED_VIEW_PHY(_view_), _scanPeriod_, _updatePeriod_,    \
+        _state_, _user_, _init_, _exit_, _update_, _display_, _scan_, _action_);                    \
+    __SCHED_VIEW_DEFINE(_view_, &__SCHED_VIEW_PHY(_view_))
 
 
 /* 视图切换 */
@@ -129,11 +132,6 @@ enum {
 
 /* GUI操作函数 ---------------------------------------------------------------*/
 eSchedError schedExGUIInit(sSchedGUI *pGUI, SchedHandle_t hGUITask);
-eSchedError schedExViewInit(sSchedView              *pView,
-                            sSchedViewPhy const     *pViewPhy,
-                            SchedTick_t             scanPeriod,
-                            SchedTick_t             updatePeriod);
-
 SchedBase_t schedExGUIStateInitial(sSchedGUI *pGUI, sSchedView *pEntryView,
                                    SchedHandle_t me, SchedEvent_t const * const e);
 SchedBase_t schedExGUIStateHandle(sSchedGUI *pGUI, sSchedView *pView,
