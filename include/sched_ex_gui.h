@@ -47,7 +47,7 @@ struct sched_view_phy
     /* 视图退出 */
     void (*Exit)(void);
     /* 定时更新函数 */
-    void (*Update)(void);
+    /* void (*Update)(void); */
     /*
      * 视图显示函数
      *
@@ -109,7 +109,7 @@ enum {
         .UserEventHandler = (_user_),           \
         .Init             = (_init_),           \
         .Exit             = (_exit_),           \
-        .Update           = (_update_),         \
+        /* .Update           = (_update_), */   \
         .Display          = (_display_),        \
         .Scan             = (_scan_),           \
         .Action           = (_action_)          \
