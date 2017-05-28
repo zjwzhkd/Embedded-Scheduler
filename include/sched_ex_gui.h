@@ -46,8 +46,14 @@ struct sched_view_phy
     void (*Init)(void);
     /* 视图退出 */
     void (*Exit)(void);
-    /* 定时更新函数 */
-    /* void (*Update)(void); */
+    /*
+     * 定时更新函数
+     *
+     * @return: 若返回SCHED_TRUE, 更新当前视图显示, 返回SCHED_FALSE则不更新
+     *
+     * @note: 若定时更新函数设置为NULL, 则默认定时更新当前视图显示
+     */
+    eSchedBool (*Update)(void);
     /*
      * 视图显示函数
      *
@@ -109,7 +115,7 @@ enum {
         .UserEventHandler = (_user_),           \
         .Init             = (_init_),           \
         .Exit             = (_exit_),           \
-        /* .Update           = (_update_), */   \
+        .Update           = (_update_),         \
         .Display          = (_display_),        \
         .Scan             = (_scan_),           \
         .Action           = (_action_)          \

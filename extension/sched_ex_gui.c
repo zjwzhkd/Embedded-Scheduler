@@ -164,13 +164,17 @@ eSchedError err;
     /* 视图更新信号 */
     case SCHED_SIG_GUI_UPDATE:
     {
-        /*
+    eSchedBool display_update = SCHED_TRUE;
+
         if (pView->phy->Update != 0)
         {
-            pView->phy->Update();
+            display_update = pView->phy->Update();
         }
-        */
-        schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_DISPLAY_UPDATE, 0);
+
+        if (display_update)
+        {
+            schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_DISPLAY_UPDATE, 0);
+        }
         return SCHED_HANDLED();
     }
 
