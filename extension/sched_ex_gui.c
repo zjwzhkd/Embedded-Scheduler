@@ -28,26 +28,29 @@ eSchedError schedExGUIInit(sSchedGUI *pGUI, SchedHandle_t hGUITask)
 {
 eSchedError ret_err = SCHED_OK;
 
-    pGUI->hGUITask     = hGUITask;
-    pGUI->hScanTimer   = NULL;
-    pGUI->hUpdateTimer = NULL;
-
+    pGUI->hGUITask = hGUITask;
     if (hGUITask == NULL)
     {
         ret_err = SCHED_ERR_PARAM;
     }
 
+#if SCHED_EX_GUI_SCAN_TIMER_EN
+    pGUI->hScanTimer = NULL;
     if (ret_err == SCHED_OK)
     {
         ret_err = schedTimerCreate(hGUITask, SCHED_SIG_GUI_SCAN, 0,
                     SCHED_TIMER_RELOAD, 0, &pGUI->hScanTimer);
     }
+#endif
 
+#if SCHED_EX_GUI_UPDATE_TIMER_EN
+    pGUI->hUpdateTimer = NULL;
     if (ret_err == SCHED_OK)
     {
         ret_err = schedTimerCreate(hGUITask, SCHED_SIG_GUI_UPDATE, 0,
                     SCHED_TIMER_RELOAD, 0, &pGUI->hUpdateTimer);
     }
+#endif
 
     return (ret_err);
 }
@@ -98,14 +101,20 @@ eSchedError err;
     /* 状态初始化信号 */
     case SCHED_SIG_ENTRY:
     {
+    #if SCHED_EX_GUI_SCAN_TIMER_EN
         err = schedTimerChangePeriod(pGUI->hScanTimer, pView->phy->scanPeriod);
-        SCHED_ASSERT(err == SCHED_OK);
-        err = schedTimerChangePeriod(pGUI->hUpdateTimer, pView->phy->updatePeriod);
         SCHED_ASSERT(err == SCHED_OK);
         err = schedTimerStart(pGUI->hScanTimer);
         SCHED_ASSERT(err == SCHED_OK);
+    #endif
+
+    #if SCHED_EX_GUI_UPDATE_TIMER_EN
+        err = schedTimerChangePeriod(pGUI->hUpdateTimer, pView->phy->updatePeriod);
+        SCHED_ASSERT(err == SCHED_OK);
         err = schedTimerStart(pGUI->hUpdateTimer);
         SCHED_ASSERT(err == SCHED_OK);
+    #endif
+
         err = schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_DISPLAY_LOAD, 0);
         SCHED_ASSERT(err == SCHED_OK);
         ((void)err);
@@ -120,11 +129,13 @@ eSchedError err;
     /* 状态退出信号 */
     case SCHED_SIG_EXIT:
     {
-        err = schedTimerReset(pGUI->hScanTimer);
-        SCHED_ASSERT(err == SCHED_OK);
-        err = schedTimerReset(pGUI->hUpdateTimer);
-        SCHED_ASSERT(err == SCHED_OK);
-        ((void)err);
+    #if SCHED_EX_GUI_SCAN_TIMER_EN
+        schedTimerReset(pGUI->hScanTimer);
+    #endif
+
+    #if SCHED_EX_GUI_UPDATE_TIMER_EN
+        schedTimerReset(pGUI->hUpdateTimer);
+    #endif
 
         if (pView->phy->Exit != 0)
         {
@@ -161,7 +172,7 @@ eSchedError err;
         return (ret);
     }
 
-    /* 视图更新信号 */
+    /* 定时更新信号 */
     case SCHED_SIG_GUI_UPDATE:
     {
     eSchedBool display_update = SCHED_TRUE;
@@ -210,6 +221,22 @@ eSchedError err;
     }
 
     }
+}
+
+/* 动作扫描外部定时器 */
+void schedExGUIExternalScanTimer(sSchedGUI *pGUI)
+{
+#if SCHED_EX_GUI_SCAN_TIMER_EN == 0
+    schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_SCAN, 0);
+#endif
+}
+
+/* 定时更新外部定时器 */
+void schedExGUIExternalUpdateTimer(sSchedGUI *pGUI)
+{
+#if SCHED_EX_GUI_UPDATE_TIMER_EN == 0
+    schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_UPDATE, 0);
+#endif
 }
 
 /* 加载当前视图显示 */

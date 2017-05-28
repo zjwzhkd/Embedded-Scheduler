@@ -21,8 +21,12 @@ typedef struct sched_view_phy   sSchedViewPhy;
 struct sched_gui
 {
     SchedHandle_t               hGUITask;           /* GUI任务句柄 */
+#if SCHED_EX_GUI_SCAN_TIMER_EN
     SchedHandle_t               hScanTimer;         /* 扫描定时器  */
+#endif
+#if SCHED_EX_GUI_UPDATE_TIMER_EN
     SchedHandle_t               hUpdateTimer;       /* 更新定时器  */
+#endif
 };
 
 /* 视图结构体 */
@@ -142,6 +146,9 @@ SchedBase_t schedExGUIStateInitial(sSchedGUI *pGUI, sSchedView *pEntryView,
                                    SchedHandle_t me, SchedEvent_t const * const e);
 SchedBase_t schedExGUIStateHandle(sSchedGUI *pGUI, sSchedView *pView,
                                   SchedHandle_t me, SchedEvent_t const * const e);
+
+void schedExGUIExternalScanTimer(sSchedGUI *pGUI);
+void schedExGUIExternalUpdateTimer(sSchedGUI *pGUI);
 
 void schedExGUIDisplayLoad(sSchedGUI *pGUI);
 void schedExGUIDisplayUpdate(sSchedGUI *pGUI);
