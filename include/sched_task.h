@@ -17,19 +17,19 @@
 eSchedError schedTaskCreate(SchedPrio_t             prio,
                             EvtPos_t                eventLen,
                             SchedEventHandler       initial,
-                            SchedHandle_t * const   phCreatedTask);
+                            sSchedTask * const      pCreatedTask);
 
 /* 事件函数 ------------------------------------------------------------------*/
-eSchedError schedEventSend(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg);
-eSchedError schedEventSendToFront(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg);
-eSchedError schedEventSendFromISR(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg);
-eSchedError schedEventSendToFrontFromISR(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg);
+eSchedError schedEventSend(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg);
+eSchedError schedEventSendToFront(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg);
+eSchedError schedEventSendFromISR(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg);
+eSchedError schedEventSendToFrontFromISR(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg);
 
 /* 执行函数 ------------------------------------------------------------------*/
 void schedTaskInit(void);
 void schedTaskInitialiseAll(void);
 eSchedBool schedTaskExecute(void);
 eSchedBool schedHasReadyTask(void);
-SchedBase_t schedStateTransfer(SchedHandle_t hTask, SchedEventHandler target);
+SchedBase_t schedStateTransfer(sSchedTask *pTask, SchedEventHandler target);
 
 #endif  /* __SCHED_TASK_H */

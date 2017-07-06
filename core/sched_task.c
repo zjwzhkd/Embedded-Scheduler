@@ -73,7 +73,7 @@ sSchedList * const _tmp_item = &(_ptask_)->prio;                                
  *
  * @param initial: 初始化伪状态
  *
- * @param phCreatedTask: 任务创建成功时, 保存新创建任务句柄的句柄变量地址
+ * @param pCreatedTask: 待创建任务管理结构体的指针
  *
  * @return: SCHED_OK                任务创建成功
  *          SCHED_ERR_CORE_STATE    调度器处于错误的状态
@@ -82,9 +82,8 @@ sSchedList * const _tmp_item = &(_ptask_)->prio;                                
 eSchedError schedTaskCreate(SchedPrio_t             prio,
                             EvtPos_t                eventLen,
                             SchedEventHandler       initial,
-                            SchedHandle_t * const   phCreatedTask)
+                            sSchedTask * const      pCreatedTask)
 {
-sSchedTask *pCreatedTask = NULL;
 eSchedBool evtbuf_init;
 
     /* 当调度器处于停止状态时, 允许创建新任务 */
@@ -93,25 +92,15 @@ eSchedBool evtbuf_init;
         return (SCHED_ERR_CORE_STATE);
     }
 
-    /* 创建并初始化任务 */
-    pCreatedTask = (sSchedTask *)schedPortMalloc(sizeof(sSchedTask));
-    if (pCreatedTask != NULL)
-    {
-        schedFSMCtor(&pCreatedTask->fsm, initial);
-        schedIntListInit(&pCreatedTask->prio);
-        SCHED_LIST_SET_VALUE(&pCreatedTask->prio, prio);
-        evtbuf_init = schedEvtbufInit(&pCreatedTask->evtbuf, eventLen);
-        if ( evtbuf_init == SCHED_FALSE )
-        {
-            schedPortFree(pCreatedTask);
-            pCreatedTask = NULL;
-        }
-    }
+    /* 初始化任务管理结构体 */
+    schedFSMCtor(&pCreatedTask->fsm, initial);
+    schedIntListInit(&pCreatedTask->prio);
+    SCHED_LIST_SET_VALUE(&pCreatedTask->prio, prio);
+    evtbuf_init = schedEvtbufInit(&pCreatedTask->evtbuf, eventLen);
 
     /* 任务创建成功 */
-    if (pCreatedTask != NULL)
+    if (evtbuf_init != SCHED_FALSE)
     {
-        *phCreatedTask = pCreatedTask;
         RECORD_READY_TASK(pCreatedTask);
         return (SCHED_OK);
     }
@@ -129,7 +118,7 @@ eSchedBool evtbuf_init;
 /**
  * 向指定的任务发送事件请求
  *
- * @param hTask: 目标任务的句柄
+ * @param pTask: 目标任务的结构体指针
  *
  * @param sig: 事件请求的信号域
  *
@@ -137,12 +126,10 @@ eSchedBool evtbuf_init;
  *
  * @return: SCHED_OK                    事件请求发送成功
  *          SCHED_ERR_CORE_STATE        调度器处于错误的状态
- *          SCHED_ERR_HANDLE_NULL       任务句柄为NULL(任务未创建)
  *          SCHED_ERR_EVENT_SEND_FAILED 事件请求发送失败
  */
-eSchedError schedEventSend(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg)
+eSchedError schedEventSend(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg)
 {
-sSchedTask *pTask = (sSchedTask *)hTask;
 eSchedBool tx_ret;
 SchedEvent_t event;
 SchedCPU_t cpu_sr;
@@ -151,12 +138,6 @@ SchedCPU_t cpu_sr;
     if ( !SCHED_CORE_IS_RUNNING() )
     {
         return (SCHED_ERR_CORE_STATE);
-    }
-
-    /* 检测任务句柄有效性 */
-    if ( hTask == NULL )
-    {
-        return (SCHED_ERR_HANDLE_NULL);
     }
 
     event.sig = sig;
@@ -184,7 +165,7 @@ SchedCPU_t cpu_sr;
 /**
  * 向指定的任务发送紧急事件请求
  *
- * @param hTask: 目标任务的句柄
+ * @param pTask: 目标任务的结构体指针
  *
  * @param sig: 事件请求的信号域
  *
@@ -192,12 +173,10 @@ SchedCPU_t cpu_sr;
  *
  * @return: SCHED_OK                    事件请求发送成功
  *          SCHED_ERR_CORE_STATE        调度器处于错误的状态
- *          SCHED_ERR_HANDLE_NULL       任务句柄为NULL(任务未创建)
  *          SCHED_ERR_EVENT_SEND_FAILED 事件请求发送失败
  */
-eSchedError schedEventSendToFront(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg)
+eSchedError schedEventSendToFront(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg)
 {
-sSchedTask *pTask = (sSchedTask *)hTask;
 eSchedBool tx_ret;
 SchedEvent_t event;
 SchedCPU_t cpu_sr;
@@ -206,12 +185,6 @@ SchedCPU_t cpu_sr;
     if ( !SCHED_CORE_IS_RUNNING() )
     {
         return (SCHED_ERR_CORE_STATE);
-    }
-
-    /* 检测任务句柄有效性 */
-    if ( hTask == NULL )
-    {
-        return (SCHED_ERR_HANDLE_NULL);
     }
 
     event.sig = sig;
@@ -239,7 +212,7 @@ SchedCPU_t cpu_sr;
 /**
  * 在中断服务中向指定的任务发送事件请求
  *
- * @param hTask: 目标任务的句柄
+ * @param pTask: 目标任务的结构体指针
  *
  * @param sig: 事件请求的信号域
  *
@@ -247,12 +220,10 @@ SchedCPU_t cpu_sr;
  *
  * @return: SCHED_OK                    事件请求发送成功
  *          SCHED_ERR_CORE_STATE        调度器处于错误的状态
- *          SCHED_ERR_HANDLE_NULL       任务句柄为NULL(任务未创建)
  *          SCHED_ERR_EVENT_SEND_FAILED 事件请求发送失败
  */
-eSchedError schedEventSendFromISR(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg)
+eSchedError schedEventSendFromISR(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg)
 {
-sSchedTask *pTask = (sSchedTask *)hTask;
 eSchedBool tx_ret;
 SchedEvent_t event;
 SchedCPU_t cpu_sr;
@@ -261,12 +232,6 @@ SchedCPU_t cpu_sr;
     if ( !SCHED_CORE_IS_RUNNING() )
     {
         return (SCHED_ERR_CORE_STATE);
-    }
-
-    /* 检测任务句柄有效性 */
-    if ( hTask == NULL )
-    {
-        return (SCHED_ERR_HANDLE_NULL);
     }
 
     event.sig = sig;
@@ -294,7 +259,7 @@ SchedCPU_t cpu_sr;
 /**
  * 在中断服务中向指定的任务发送紧急事件请求
  *
- * @param hTask: 目标任务的句柄
+ * @param pTask: 目标任务的结构体指针
  *
  * @param sig: 事件请求的信号域
  *
@@ -302,12 +267,10 @@ SchedCPU_t cpu_sr;
  *
  * @return: SCHED_OK                    事件请求发送成功
  *          SCHED_ERR_CORE_STATE        调度器处于错误的状态
- *          SCHED_ERR_HANDLE_NULL       任务句柄为NULL(任务未创建)
  *          SCHED_ERR_EVENT_SEND_FAILED 事件请求发送失败
  */
-eSchedError schedEventSendToFrontFromISR(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg)
+eSchedError schedEventSendToFrontFromISR(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg)
 {
-sSchedTask *pTask = (sSchedTask *)hTask;
 eSchedBool tx_ret;
 SchedEvent_t event;
 SchedCPU_t cpu_sr;
@@ -316,12 +279,6 @@ SchedCPU_t cpu_sr;
     if ( !SCHED_CORE_IS_RUNNING() )
     {
         return (SCHED_ERR_CORE_STATE);
-    }
-
-    /* 检测任务句柄有效性 */
-    if ( hTask == NULL )
-    {
-        return (SCHED_ERR_HANDLE_NULL);
     }
 
     event.sig = sig;
@@ -439,10 +396,8 @@ SchedCPU_t cpu_sr;
 }
 
 /* 设置状态转移目标 */
-SchedBase_t schedStateTransfer(SchedHandle_t hTask, SchedEventHandler target)
+SchedBase_t schedStateTransfer(sSchedTask *pTask, SchedEventHandler target)
 {
-sSchedTask *pTask = (sSchedTask *)hTask;
-
     pTask->fsm.state = target;
     return (SCHED_RET_TRAN);
 }
