@@ -11,20 +11,6 @@
 #include "sched_tick.h"
 #include "sched_task.h"
 #include "sched_api.h"
-/*******************************************************************************
-
-                                 定时器类型定义
-
-*******************************************************************************/
-typedef struct sched_timer
-{
-    sSchedDelay         delay;
-    SchedHandle_t       hTargetTask;
-    SchedEvent_t        event;
-    SchedTick_t         period;
-    eSchedTimerMode     mode;
-    eSchedFlag          arrival;
-} sSchedTimer;
 
 /*******************************************************************************
 

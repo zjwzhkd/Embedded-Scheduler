@@ -12,31 +12,13 @@
 /* 头文件 --------------------------------------------------------------------*/
 #include "sched_proto.h"
 #include "sched_list.h"
+#include "sched_core_struct.h"
 
 /* 节拍管理函数 --------------------------------------------------------------*/
 void schedTickInit(void);
 void schedTickHandler(void);
 SchedTick_t schedTickGetCount(void);
 SchedTick_t schedTickGetCountFromISR(void);
-
-/* 延时管理类型 --------------------------------------------------------------*/
-struct sched_delay;
-typedef struct sched_delay sSchedDelay;
-
-/* 延时回调函数原型
- *
- * @param me: 指向延时结束的延时管理结构体
- *
- * @return: 继续延时的节拍数, 若为0, 则表示不继续延时
- */
-typedef SchedTick_t (*SchedDelayCB)(sSchedDelay *me);
-
-/* 延时管理结构体 */
-struct sched_delay
-{
-    sSchedList      item;   /* 节拍延时链表项 */
-    SchedDelayCB    cb;     /* 延时回调函数   */
-};
 
 /* 延时管理宏 ----------------------------------------------------------------*/
 /* 判断延时对象是否空闲(未加入延时链表)

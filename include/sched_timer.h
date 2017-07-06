@@ -11,6 +11,7 @@
 
 /* 头文件 --------------------------------------------------------------------*/
 #include "sched_proto.h"
+#include "sched_core_struct.h"
 
 /* 定时器管理 ----------------------------------------------------------------*/
 eSchedError schedTimerCreate(SchedHandle_t          hTargetTask,

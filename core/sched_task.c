@@ -12,17 +12,6 @@
 #include "sched_core.h"
 #include "sched_evtbuf.h"
 #include "sched_api.h"
-/*******************************************************************************
-
-                                  任务类型定义
-
-*******************************************************************************/
-typedef struct sched_task
-{
-    sSchedFSM               fsm;
-    sSchedList              prio;
-    sSchedEvtbuf            evtbuf;
-} sSchedTask;
 
 /*******************************************************************************
 

@@ -11,6 +11,7 @@
 
 /* 头文件 --------------------------------------------------------------------*/
 #include "sched_proto.h"
+#include "sched_core_struct.h"
 
 /* 管理函数 ------------------------------------------------------------------*/
 eSchedError schedTaskCreate(SchedPrio_t             prio,

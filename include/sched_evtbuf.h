@@ -11,35 +11,7 @@
 
 /* 头文件 --------------------------------------------------------------------*/
 #include "sched_proto.h"
-
-/* 事件缓存类型 --------------------------------------------------------------*/
-struct sched_evtbuf;
-typedef struct sched_evtbuf sSchedEvtbuf;
-
-#if SCHED_EVTBUF_QUEUE_EN
-
-    #include "sched_priotbl.h"
-    #include "sched_queue.h"
-    /* 支持使用优先级记录表或者事件队列作为事件缓存区 */
-    struct sched_evtbuf
-    {
-        EvtPos_t            len;
-        union {
-            sSchedPriotbl   *tbl;
-            sSchedQueue     *queue;
-        } p;
-    };
-
-#else
-
-    #include "sched_priotbl.h"
-    /* 仅支持使用优先级记录表作为事件缓存区 */
-    struct sched_evtbuf
-    {
-        sSchedPriotbl       tbl;
-    };
-
-#endif
+#include "sched_core_struct.h"
 
 /* 事件缓存管理 --------------------------------------------------------------*/
 eSchedBool schedEvtbufInit(sSchedEvtbuf *evtbuf, EvtPos_t len);
