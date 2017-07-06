@@ -15,7 +15,7 @@
 
 /* 状态机函数 ----------------------------------------------------------------*/
 void schedFSMCtor(sSchedFSM *fsm, SchedEventHandler initial);
-void schedFSMInit(sSchedFSM *fsm, SchedHandle_t me);
-void schedFSMDispatch(sSchedFSM *fsm, SchedHandle_t me, SchedEvent_t const *e);
+void schedFSMInit(sSchedFSM *fsm, void *me);
+void schedFSMDispatch(sSchedFSM *fsm, void *me, SchedEvent_t const *e);
 
 #endif  /* __SCHED_FSM_H */

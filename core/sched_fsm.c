@@ -32,7 +32,7 @@ void schedFSMCtor(sSchedFSM *fsm, SchedEventHandler initial)
 }
 
 /* 初始化状态机, 实现初始化状态转移 */
-void schedFSMInit(sSchedFSM *fsm, SchedHandle_t me)
+void schedFSMInit(sSchedFSM *fsm, void *me)
 {
 SchedBase_t ret;
 
@@ -46,7 +46,7 @@ SchedBase_t ret;
 }
 
 /* 状态机处理事件 */
-void schedFSMDispatch(sSchedFSM *fsm, SchedHandle_t me, SchedEvent_t const *e)
+void schedFSMDispatch(sSchedFSM *fsm, void *me, SchedEvent_t const *e)
 {
 SchedEventHandler tmp;
 SchedBase_t ret;
