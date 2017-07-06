@@ -10,6 +10,8 @@
 #define __SCHED_API_H
 
 #include "sched_proto.h"
+#include "sched_core_struct.h"
+
 /*******************************************************************************
 
                                      调度器
@@ -42,7 +44,7 @@ SchedTick_t schedTickGetCountFromISR(void);
 *******************************************************************************/
 
 #define SCHED_STATE_FUNCTION(_func_)    \
-    SchedBase_t _func_(SchedHandle_t me, SchedEvent_t const * const e)
+    SchedBase_t _func_(void *me, SchedEvent_t const * const e)
 
 #define SCHED_HANDLED()         ( SCHED_RET_HANDLED )
 #define SCHED_IGNORED()         ( SCHED_RET_IGNORED )
@@ -51,36 +53,36 @@ SchedTick_t schedTickGetCountFromISR(void);
 eSchedError schedTaskCreate(SchedPrio_t             prio,
                             EvtPos_t                eventLen,
                             SchedEventHandler       initial,
-                            SchedHandle_t * const   phCreatedTask);
+                            sSchedTask * const      pCreatedTask);
 
-eSchedError schedEventSend(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg);
-eSchedError schedEventSendToFront(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg);
-eSchedError schedEventSendFromISR(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg);
-eSchedError schedEventSendToFrontFromISR(SchedHandle_t hTask, EvtSig_t sig, EvtMsg_t msg);
+eSchedError schedEventSend(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg);
+eSchedError schedEventSendToFront(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg);
+eSchedError schedEventSendFromISR(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg);
+eSchedError schedEventSendToFrontFromISR(sSchedTask *pTask, EvtSig_t sig, EvtMsg_t msg);
 
-SchedBase_t schedStateTransfer(SchedHandle_t hTask, SchedEventHandler target);
+SchedBase_t schedStateTransfer(sSchedTask *pTask, SchedEventHandler target);
 
 /*******************************************************************************
 
                                    定时器管理
 
 *******************************************************************************/
-eSchedError schedTimerCreate(SchedHandle_t          hTargetTask,
+eSchedError schedTimerCreate(sSchedTask * const     pTargetTask,
                              EvtSig_t               eventSig,
                              EvtMsg_t               eventMsg,
                              eSchedTimerMode        mode,
                              SchedTick_t            period,
-                             SchedHandle_t * const  phCreatedTimer);
+                             sSchedTimer * const    pCreatedTimer);
 
-eSchedError schedTimerStart(SchedHandle_t hTimer);
-eSchedError schedTimerReset(SchedHandle_t hTimer);
+eSchedError schedTimerStart(sSchedTimer *pTimer);
+eSchedError schedTimerReset(sSchedTimer *pTimer);
 
-eSchedError schedTimerChangeTarget(SchedHandle_t hTimer, SchedHandle_t hTargetTask);
-eSchedError schedTimerChangeEvent(SchedHandle_t hTimer, EvtSig_t eventSig, EvtMsg_t eventMsg);
-eSchedError schedTimerChangeMode(SchedHandle_t hTimer, eSchedTimerMode mode);
-eSchedError schedTimerChangePeriod(SchedHandle_t hTimer, SchedTick_t period);
+eSchedError schedTimerChangeTarget(sSchedTimer *pTimer, sSchedTask * const pTargetTask);
+eSchedError schedTimerChangeEvent(sSchedTimer *pTimer, EvtSig_t eventSig, EvtMsg_t eventMsg);
+eSchedError schedTimerChangeMode(sSchedTimer *pTimer, eSchedTimerMode mode);
+eSchedError schedTimerChangePeriod(sSchedTimer *pTimer, SchedTick_t period);
 
-eSchedTimerStatus schedTimerGetStatus(SchedHandle_t hTimer);
+eSchedTimerStatus schedTimerGetStatus(sSchedTimer *pTimer);
 
 /*******************************************************************************
 
