@@ -7,7 +7,6 @@
 *******************************************************************************/
 
 #include "sched_task.h"
-#include "sched_object.h"
 #include "sched_fsm.h"
 #include "sched_list.h"
 #include "sched_core.h"
@@ -20,8 +19,6 @@
 *******************************************************************************/
 typedef struct sched_task
 {
-    SCHED_BASE_OBJ_DEFINE(obj)
-
     sSchedFSM               fsm;
     sSchedList              prio;
     sSchedEvtbuf            evtbuf;
@@ -111,7 +108,6 @@ eSchedBool evtbuf_init;
     pCreatedTask = (sSchedTask *)schedPortMalloc(sizeof(sSchedTask));
     if (pCreatedTask != NULL)
     {
-        SCHED_BASE_OBJ_INITIAL(pCreatedTask, SCHED_OBJ_TASK);
         schedFSMCtor(&pCreatedTask->fsm, initial);
         schedIntListInit(&pCreatedTask->prio);
         SCHED_LIST_SET_VALUE(&pCreatedTask->prio, prio);
@@ -173,7 +169,6 @@ SchedCPU_t cpu_sr;
     {
         return (SCHED_ERR_HANDLE_NULL);
     }
-    SCHED_BASE_OBJ_ASSERT(hTask, SCHED_OBJ_TASK);
 
     event.sig = sig;
     event.msg = msg;
@@ -229,7 +224,6 @@ SchedCPU_t cpu_sr;
     {
         return (SCHED_ERR_HANDLE_NULL);
     }
-    SCHED_BASE_OBJ_ASSERT(hTask, SCHED_OBJ_TASK);
 
     event.sig = sig;
     event.msg = msg;
@@ -285,7 +279,6 @@ SchedCPU_t cpu_sr;
     {
         return (SCHED_ERR_HANDLE_NULL);
     }
-    SCHED_BASE_OBJ_ASSERT(hTask, SCHED_OBJ_TASK);
 
     event.sig = sig;
     event.msg = msg;
@@ -341,7 +334,6 @@ SchedCPU_t cpu_sr;
     {
         return (SCHED_ERR_HANDLE_NULL);
     }
-    SCHED_BASE_OBJ_ASSERT(hTask, SCHED_OBJ_TASK);
 
     event.sig = sig;
     event.msg = msg;
@@ -462,7 +454,6 @@ SchedBase_t schedStateTransfer(SchedHandle_t hTask, SchedEventHandler target)
 {
 sSchedTask *pTask = (sSchedTask *)hTask;
 
-    SCHED_BASE_OBJ_ASSERT(hTask, SCHED_OBJ_TASK);
     pTask->fsm.state = target;
     return (SCHED_RET_TRAN);
 }

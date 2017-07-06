@@ -7,7 +7,6 @@
 *******************************************************************************/
 
 #include "sched_timer.h"
-#include "sched_object.h"
 #include "sched_core.h"
 #include "sched_tick.h"
 #include "sched_task.h"
@@ -19,8 +18,6 @@
 *******************************************************************************/
 typedef struct sched_timer
 {
-    SCHED_BASE_OBJ_DEFINE(obj)
-
     sSchedDelay         delay;
     SchedHandle_t       hTargetTask;
     SchedEvent_t        event;
@@ -96,13 +93,11 @@ sSchedTimer *pCreatedTimer = NULL;
     {
         return (SCHED_ERR_PARAM);
     }
-    SCHED_BASE_OBJ_ASSERT(hTargetTask, SCHED_OBJ_TASK);
 
     /* 创建并初始化定时器 */
     pCreatedTimer = (sSchedTimer *)schedPortMalloc(sizeof(sSchedTimer));
     if (pCreatedTimer != NULL)
     {
-        SCHED_BASE_OBJ_INITIAL(pCreatedTimer, SCHED_OBJ_TIMER);
         schedDelayInit(&pCreatedTimer->delay, timer_delay_cb);
         pCreatedTimer->hTargetTask = hTargetTask;
         pCreatedTimer->event.sig   = eventSig;
@@ -151,7 +146,6 @@ SchedCPU_t  cpu_sr;
     {
         return (SCHED_ERR_HANDLE_NULL);
     }
-    SCHED_BASE_OBJ_ASSERT(hTimer, SCHED_OBJ_TIMER);
 
     cpu_sr = SCHED_EnterCritical();
     {
@@ -190,7 +184,6 @@ SchedCPU_t  cpu_sr;
     {
         return (SCHED_ERR_HANDLE_NULL);
     }
-    SCHED_BASE_OBJ_ASSERT(hTimer, SCHED_OBJ_TIMER);
 
     cpu_sr = SCHED_EnterCritical();
     {
@@ -223,14 +216,12 @@ SchedCPU_t  cpu_sr;
     {
         return (SCHED_ERR_HANDLE_NULL);
     }
-    SCHED_BASE_OBJ_ASSERT(hTimer, SCHED_OBJ_TIMER);
 
     /* 检验参数是否符合要求 */
     if ( hTargetTask == NULL )
     {
         return (SCHED_ERR_PARAM);
     }
-    SCHED_BASE_OBJ_ASSERT(hTargetTask, SCHED_OBJ_TASK);
 
     cpu_sr = SCHED_EnterCritical();
     {
@@ -263,7 +254,6 @@ SchedCPU_t  cpu_sr;
     {
         return (SCHED_ERR_HANDLE_NULL);
     }
-    SCHED_BASE_OBJ_ASSERT(hTimer, SCHED_OBJ_TIMER);
 
     cpu_sr = SCHED_EnterCritical();
     {
@@ -295,7 +285,6 @@ SchedCPU_t  cpu_sr;
     {
         return (SCHED_ERR_HANDLE_NULL);
     }
-    SCHED_BASE_OBJ_ASSERT(hTimer, SCHED_OBJ_TIMER);
 
     cpu_sr = SCHED_EnterCritical();
     {
@@ -326,7 +315,6 @@ SchedCPU_t  cpu_sr;
     {
         return (SCHED_ERR_HANDLE_NULL);
     }
-    SCHED_BASE_OBJ_ASSERT(hTimer, SCHED_OBJ_TIMER);
 
     cpu_sr = SCHED_EnterCritical();
     {
@@ -356,7 +344,6 @@ eSchedTimerStatus ret;
     {
         return (SCHED_TIMER_RESET);
     }
-    SCHED_BASE_OBJ_ASSERT(hTimer, SCHED_OBJ_TIMER);
 
     cpu_sr = SCHED_EnterCritical();
     {
