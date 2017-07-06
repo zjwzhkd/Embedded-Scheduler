@@ -20,11 +20,8 @@
 /* 调度器任务优先级 */
 typedef SchedTick_t SchedPrio_t;
 
-/* 调度器对象句柄 */
-typedef void * SchedHandle_t;
-
 /* 调度器事件处理函数 */
-typedef SchedBase_t (*SchedEventHandler)(SchedHandle_t me, SchedEvent_t const * const e);
+typedef SchedBase_t (*SchedEventHandler)(void *me, SchedEvent_t const * const e);
 
 /* 调度器布尔值 */
 typedef enum {SCHED_FALSE = 0, SCHED_TRUE = 1} eSchedBool;
@@ -38,7 +35,6 @@ typedef enum
 {
     SCHED_OK = 0,
     /* 通用错误代码 */
-    SCHED_ERR_HANDLE_NULL,
     SCHED_ERR_PARAM,
     SCHED_ERR_CREATE_FAILED,
     /* 核心状态错误代码 */
