@@ -75,9 +75,7 @@ sSchedList * const _tmp_item = &(_ptask_)->prio;                                
  *
  * @param pCreatedTask: 待创建任务管理结构体的指针
  *
- * @return: SCHED_OK                任务创建成功
- *          SCHED_ERR_CORE_STATE    调度器处于错误的状态
- *          SCHED_ERR_CREATE_FAILED 任务创建失败(内存分配失败)
+ * @return: SCHED_OK                    任务创建成功
  */
 eSchedError schedTaskCreate(SchedPrio_t             prio,
                             EvtPos_t                eventLen,
@@ -87,27 +85,20 @@ eSchedError schedTaskCreate(SchedPrio_t             prio,
 eSchedBool evtbuf_init;
 
     /* 当调度器处于停止状态时, 允许创建新任务 */
-    if ( !SCHED_CORE_IS_STOPPED() )
-    {
-        return (SCHED_ERR_CORE_STATE);
-    }
+    SCHED_ASSERT( SCHED_CORE_IS_STOPPED() );
 
     /* 初始化任务管理结构体 */
     schedFSMCtor(&pCreatedTask->fsm, initial);
     schedIntListInit(&pCreatedTask->prio);
     SCHED_LIST_SET_VALUE(&pCreatedTask->prio, prio);
     evtbuf_init = schedEvtbufInit(&pCreatedTask->evtbuf, eventLen);
+    SCHED_ASSERT(evtbuf_init != SCHED_FALSE);
+    ((void) evtbuf_init);
 
-    /* 任务创建成功 */
-    if (evtbuf_init != SCHED_FALSE)
-    {
-        RECORD_READY_TASK(pCreatedTask);
-        return (SCHED_OK);
-    }
-    else
-    {
-        return (SCHED_ERR_CREATE_FAILED);
-    }
+    /* 将新任务添加至就绪链表 */
+    RECORD_READY_TASK(pCreatedTask);
+
+    return (SCHED_OK);
 }
 
 /*******************************************************************************
