@@ -14,21 +14,21 @@
 #include "sched_core_struct.h"
 
 /* 定时器管理 ----------------------------------------------------------------*/
-eSchedError schedTimerCreate(SchedHandle_t          hTargetTask,
+eSchedError schedTimerCreate(sSchedTask * const     pTargetTask,
                              EvtSig_t               eventSig,
                              EvtMsg_t               eventMsg,
                              eSchedTimerMode        mode,
                              SchedTick_t            period,
-                             SchedHandle_t * const  phCreatedTimer);
+                             sSchedTimer * const    pCreatedTimer);
 
-eSchedError schedTimerStart(SchedHandle_t hTimer);
-eSchedError schedTimerReset(SchedHandle_t hTimer);
+eSchedError schedTimerStart(sSchedTimer *pTimer);
+eSchedError schedTimerReset(sSchedTimer *pTimer);
 
-eSchedError schedTimerChangeTarget(SchedHandle_t hTimer, SchedHandle_t hTargetTask);
-eSchedError schedTimerChangeEvent(SchedHandle_t hTimer, EvtSig_t eventSig, EvtMsg_t eventMsg);
-eSchedError schedTimerChangeMode(SchedHandle_t hTimer, eSchedTimerMode mode);
-eSchedError schedTimerChangePeriod(SchedHandle_t hTimer, SchedTick_t period);
+eSchedError schedTimerChangeTarget(sSchedTimer *pTimer, sSchedTask * const pTargetTask);
+eSchedError schedTimerChangeEvent(sSchedTimer *pTimer, EvtSig_t eventSig, EvtMsg_t eventMsg);
+eSchedError schedTimerChangeMode(sSchedTimer *pTimer, eSchedTimerMode mode);
+eSchedError schedTimerChangePeriod(sSchedTimer *pTimer, SchedTick_t period);
 
-eSchedTimerStatus schedTimerGetStatus(SchedHandle_t hTimer);
+eSchedTimerStatus schedTimerGetStatus(sSchedTimer *pTimer);
 
 #endif  /* __SCHED_TIMER_H */

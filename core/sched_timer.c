@@ -22,7 +22,7 @@ static SchedTick_t timer_delay_cb(sSchedDelay *me)
 {
 sSchedTimer *pTimer = container_of(me, sSchedTimer, delay);
 
-    schedEventSendFromISR(pTimer->hTargetTask, pTimer->event.sig, pTimer->event.msg);
+    schedEventSendFromISR(pTimer->pTargetTask, pTimer->event.sig, pTimer->event.msg);
     pTimer->arrival = SCHED_SET;
     if (pTimer->mode == SCHED_TIMER_ONCE)
     {
@@ -42,7 +42,7 @@ sSchedTimer *pTimer = container_of(me, sSchedTimer, delay);
 /**
  * 创建定时器
  *
- * @param hTargetTask: 目标任务句柄
+ * @param pTargetTask: 目标任务的结构体指针
  *
  * @param eventSig: 定时器事件的信号
  *
@@ -52,85 +52,52 @@ sSchedTimer *pTimer = container_of(me, sSchedTimer, delay);
  *
  * @param period: 定时器的定时时长
  *
- * @param phCreatedTimer: 定时器创建成功时, 保存新创建定时器句柄的句柄变量地址
+ * @param pCreatedTimer: 待创建定时器的结构体指针
  *
  * @return: SCHED_OK                定时器创建成功
  *          SCHED_ERR_CORE_STATE    调度器处于错误的状态
- *          SCHED_ERR_PARAM         参数不符合要求
- *          SCHED_ERR_CREATE_FAILED 定时器创建失败(内存分配失败)
  */
-eSchedError schedTimerCreate(SchedHandle_t          hTargetTask,
+eSchedError schedTimerCreate(sSchedTask * const     pTargetTask,
                              EvtSig_t               eventSig,
                              EvtMsg_t               eventMsg,
                              eSchedTimerMode        mode,
                              SchedTick_t            period,
-                             SchedHandle_t * const  phCreatedTimer)
+                             sSchedTimer * const    pCreatedTimer)
 {
-sSchedTimer *pCreatedTimer = NULL;
-
     /* 当调度器处于停止状态时, 允许创建新定时器 */
     if ( !SCHED_CORE_IS_STOPPED() )
     {
         return (SCHED_ERR_CORE_STATE);
     }
 
-    /* 检验参数是否符合要求 */
-    if ( hTargetTask == NULL )
-    {
-        return (SCHED_ERR_PARAM);
-    }
+    /* 初始化定时器结构体 */
+    schedDelayInit(&pCreatedTimer->delay, timer_delay_cb);
+    pCreatedTimer->pTargetTask = pTargetTask;
+    pCreatedTimer->event.sig   = eventSig;
+    pCreatedTimer->event.msg   = eventMsg;
+    pCreatedTimer->period      = period;
+    pCreatedTimer->mode        = mode;
+    pCreatedTimer->arrival     = SCHED_RESET;
 
-    /* 创建并初始化定时器 */
-    pCreatedTimer = (sSchedTimer *)schedPortMalloc(sizeof(sSchedTimer));
-    if (pCreatedTimer != NULL)
-    {
-        schedDelayInit(&pCreatedTimer->delay, timer_delay_cb);
-        pCreatedTimer->hTargetTask = hTargetTask;
-        pCreatedTimer->event.sig   = eventSig;
-        pCreatedTimer->event.msg   = eventMsg;
-        pCreatedTimer->period      = period;
-        pCreatedTimer->mode        = mode;
-        pCreatedTimer->arrival     = SCHED_RESET;
-    }
-
-    /* 定时器创建成功 */
-    if (pCreatedTimer != NULL)
-    {
-        *phCreatedTimer = pCreatedTimer;
-        return (SCHED_OK);
-    }
-    else
-    {
-        return (SCHED_ERR_CREATE_FAILED);
-    }
+    return (SCHED_OK);
 }
 
 /**
  * 启动(重启)定时器
  *
- * @param hTimer: 待操作的定时器句柄
+ * @param pTimer: 待操作定时器的结构体指针
  *
  * @return: SCHED_OK                定时器成功启动(重启)
  *          SCHED_ERR_CORE_STATE    调度器处于错误的状态
- *          SCHED_ERR_HANDLE_NULL   定时器句柄为NULL(定时器未创建)
  */
-eSchedError schedTimerStart(SchedHandle_t hTimer)
+eSchedError schedTimerStart(sSchedTimer *pTimer)
 {
-sSchedTimer *pTimer = (sSchedTimer *)hTimer;
 SchedCPU_t  cpu_sr;
 
     /* 检测调度器是否处于运行状态 */
-    /*
     if ( !SCHED_CORE_IS_RUNNING() )
     {
         return (SCHED_ERR_CORE_STATE);
-    }
-    */
-
-    /* 检测定时器句柄有效性 */
-    if ( hTimer == NULL )
-    {
-        return (SCHED_ERR_HANDLE_NULL);
     }
 
     cpu_sr = SCHED_EnterCritical();
@@ -146,29 +113,19 @@ SchedCPU_t  cpu_sr;
 /**
  * 复位定时器
  *
- * @param hTimer: 待操作的定时器句柄
+ * @param pTimer: 待操作定时器的结构体指针
  *
  * @return: SCHED_OK                定时器成功复位
  *          SCHED_ERR_CORE_STATE    调度器处于错误的状态
- *          SCHED_ERR_HANDLE_NULL   定时器句柄为NULL(定时器未创建)
  */
-eSchedError schedTimerReset(SchedHandle_t hTimer)
+eSchedError schedTimerReset(sSchedTimer *pTimer)
 {
-sSchedTimer *pTimer = (sSchedTimer *)hTimer;
 SchedCPU_t  cpu_sr;
 
     /* 检测调度器是否处于运行状态 */
-    /*
     if ( !SCHED_CORE_IS_RUNNING() )
     {
         return (SCHED_ERR_CORE_STATE);
-    }
-    */
-
-    /* 检测定时器句柄有效性 */
-    if ( hTimer == NULL )
-    {
-        return (SCHED_ERR_HANDLE_NULL);
     }
 
     cpu_sr = SCHED_EnterCritical();
@@ -182,36 +139,21 @@ SchedCPU_t  cpu_sr;
 }
 
 /**
- * 改变定时器的目标任务句柄
+ * 改变定时器的目标任务
  *
- * @param hTimer: 待操作的定时器句柄
+ * @param pTimer: 待操作定时器的结构体指针
  *
- * @param hTargetTask: 目标任务句柄
+ * @param pTargetTask: 目标任务的结构体指针
  *
  * @return: SCHED_OK                目标任务句柄修改成功
- *          SCHED_ERR_HANDLE_NULL   定时器句柄为NULL(定时器未创建)
- *          SCHED_ERR_PARAM         参数不符合要求
  */
-eSchedError schedTimerChangeTarget(SchedHandle_t hTimer, SchedHandle_t hTargetTask)
+eSchedError schedTimerChangeTarget(sSchedTimer *pTimer, sSchedTask * const pTargetTask)
 {
-sSchedTimer *pTimer = (sSchedTimer *)hTimer;
 SchedCPU_t  cpu_sr;
-
-    /* 检测定时器句柄有效性 */
-    if ( hTimer == NULL )
-    {
-        return (SCHED_ERR_HANDLE_NULL);
-    }
-
-    /* 检验参数是否符合要求 */
-    if ( hTargetTask == NULL )
-    {
-        return (SCHED_ERR_PARAM);
-    }
 
     cpu_sr = SCHED_EnterCritical();
     {
-        pTimer->hTargetTask = hTargetTask;
+        pTimer->pTargetTask = pTargetTask;
     }
     SCHED_ExitCritical(cpu_sr);
 
@@ -221,25 +163,17 @@ SchedCPU_t  cpu_sr;
 /**
  * 改变定时器的定时器事件
  *
- * @param hTimer: 待操作的定时器句柄
+ * @param pTimer: 待操作定时器的结构体指针
  *
  * @param eventSig: 定时器事件的信号
  *
  * @param eventMsg: 定时器事件的消息
  *
  * @return: SCHED_OK                定时器事件修改成功
- *          SCHED_ERR_HANDLE_NULL   定时器句柄为NULL(定时器未创建)
  */
-eSchedError schedTimerChangeEvent(SchedHandle_t hTimer, EvtSig_t eventSig, EvtMsg_t eventMsg)
+eSchedError schedTimerChangeEvent(sSchedTimer *pTimer, EvtSig_t eventSig, EvtMsg_t eventMsg)
 {
-sSchedTimer *pTimer = (sSchedTimer *)hTimer;
 SchedCPU_t  cpu_sr;
-
-    /* 检测任务句柄有效性 */
-    if ( hTimer == NULL )
-    {
-        return (SCHED_ERR_HANDLE_NULL);
-    }
 
     cpu_sr = SCHED_EnterCritical();
     {
@@ -254,23 +188,15 @@ SchedCPU_t  cpu_sr;
 /**
  * 改变定时器的工作模式
  *
- * @param hTimer: 待操作的定时器句柄
+ * @param pTimer: 待操作定时器的结构体指针
  *
  * @param mode: 定时器工作模式
  *
  * @return: SCHED_OK                工作模式修改成功
- *          SCHED_ERR_HANDLE_NULL   定时器句柄为NULL(定时器未创建)
  */
-eSchedError schedTimerChangeMode(SchedHandle_t hTimer, eSchedTimerMode mode)
+eSchedError schedTimerChangeMode(sSchedTimer *pTimer, eSchedTimerMode mode)
 {
-sSchedTimer *pTimer = (sSchedTimer *)hTimer;
 SchedCPU_t  cpu_sr;
-
-    /* 检测定时器句柄有效性 */
-    if ( hTimer == NULL )
-    {
-        return (SCHED_ERR_HANDLE_NULL);
-    }
 
     cpu_sr = SCHED_EnterCritical();
     {
@@ -284,23 +210,15 @@ SchedCPU_t  cpu_sr;
 /**
  * 改变定时器的定时时长
  *
- * @param hTimer: 待操作的定时器句柄
+ * @param pTimer: 待操作定时器的结构体指针
  *
  * @param period: 定时器的定时时长
  *
  * @return: SCHED_OK                定时时长修改成功
- *          SCHED_ERR_HANDLE_NULL   定时器句柄为NULL(定时器未创建)
  */
-eSchedError schedTimerChangePeriod(SchedHandle_t hTimer, SchedTick_t period)
+eSchedError schedTimerChangePeriod(sSchedTimer *pTimer, SchedTick_t period)
 {
-sSchedTimer *pTimer = (sSchedTimer *)hTimer;
 SchedCPU_t  cpu_sr;
-
-    /* 检测定时器句柄有效性 */
-    if ( hTimer == NULL )
-    {
-        return (SCHED_ERR_HANDLE_NULL);
-    }
 
     cpu_sr = SCHED_EnterCritical();
     {
@@ -314,22 +232,16 @@ SchedCPU_t  cpu_sr;
 /**
  * 获取定时器当前状态
  *
- * @param hTimer: 定时器句柄
+ * @param pTimer: 待操作定时器的结构体指针
  *
- * @return: SCHED_TIMER_RESET       定时器处于复位状态, 或者定时器未创建
+ * @return: SCHED_TIMER_RESET       定时器处于复位状态
  *          SCHED_TIMER_RUNNING     定时器正在运行
  *          SCHED_TIMER_ARRIVAL     定时器计时结束, 并且处于停止状态
  */
-eSchedTimerStatus schedTimerGetStatus(SchedHandle_t hTimer)
+eSchedTimerStatus schedTimerGetStatus(sSchedTimer *pTimer)
 {
-sSchedTimer *pTimer = (sSchedTimer *)hTimer;
 SchedCPU_t  cpu_sr;
 eSchedTimerStatus ret;
-
-    if (hTimer == NULL)
-    {
-        return (SCHED_TIMER_RESET);
-    }
 
     cpu_sr = SCHED_EnterCritical();
     {
