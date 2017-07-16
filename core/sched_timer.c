@@ -55,7 +55,6 @@ sSchedTimer *pTimer = container_of(me, sSchedTimer, delay);
  * @param pCreatedTimer: 待创建定时器的结构体指针
  *
  * @return: SCHED_OK                定时器创建成功
- *          SCHED_ERR_CORE_STATE    调度器处于错误的状态
  */
 eSchedError schedTimerCreate(sSchedTask * const     pTargetTask,
                              EvtSig_t               eventSig,
@@ -65,10 +64,7 @@ eSchedError schedTimerCreate(sSchedTask * const     pTargetTask,
                              sSchedTimer * const    pCreatedTimer)
 {
     /* 当调度器处于停止状态时, 允许创建新定时器 */
-    if ( !SCHED_CORE_IS_STOPPED() )
-    {
-        return (SCHED_ERR_CORE_STATE);
-    }
+    SCHED_ASSERT( SCHED_CORE_IS_STOPPED() );
 
     /* 初始化定时器结构体 */
     schedDelayInit(&pCreatedTimer->delay, timer_delay_cb);
