@@ -46,9 +46,13 @@ SchedTick_t schedTickGetCountFromISR(void);
 #define SCHED_STATE_FUNCTION(_func_)    \
     SchedBase_t _func_(void *me, SchedEvent_t const * const e)
 
+#define THIS_TASK()             ( (sSchedTask *) me )
+#define EVT_SIG()               ( e->sig )
+#define EVT_MSG()               ( e->msg )
+
 #define SCHED_HANDLED()         ( SCHED_RET_HANDLED )
 #define SCHED_IGNORED()         ( SCHED_RET_IGNORED )
-#define SCHED_TRAN(_target_)    ( schedStateTransfer(me, (_target_)) )
+#define SCHED_TRAN(_target_)    ( schedStateTransfer(THIS_TASK(), (_target_)) )
 
 eSchedError schedTaskCreate(SchedPrio_t             prio,
                             EvtPos_t                eventLen,
