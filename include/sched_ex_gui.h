@@ -10,7 +10,7 @@
 #define __SCHED_EX_GUI_H
 
 /* 头文件 --------------------------------------------------------------------*/
-#include "sched_proto.h"
+#include "sched_api.h"
 
 /* 结构体类型 ----------------------------------------------------------------*/
 typedef struct sched_gui        sSchedGUI;
@@ -20,12 +20,12 @@ typedef struct sched_view_phy   sSchedViewPhy;
 /* GUI结构体 */
 struct sched_gui
 {
-    SchedHandle_t               hGUITask;           /* GUI任务句柄 */
+    sSchedTask                  task;                /* GUI任务 */
 #if SCHED_EX_GUI_SCAN_TIMER_EN
-    SchedHandle_t               hScanTimer;         /* 扫描定时器  */
+    sSchedTimer                 scanTimer;           /* 扫描定时器 */
 #endif
 #if SCHED_EX_GUI_UPDATE_TIMER_EN
-    SchedHandle_t               hUpdateTimer;       /* 更新定时器  */
+    sSchedTimer                 updateTimer;         /* 更新定时器 */
 #endif
 };
 
@@ -141,11 +141,15 @@ enum {
     ( SCHED_TRAN((_pTargetView_)->ViewStateHandler) )
 
 /* GUI操作函数 ---------------------------------------------------------------*/
-eSchedError schedExGUIInit(sSchedGUI *pGUI, SchedHandle_t hGUITask);
+eSchedError schedExGUICreate(SchedPrio_t             prio,
+                             EvtPos_t                eventLen,
+                             SchedEventHandler       initial,
+                             sSchedGUI * const       pCreatedGUI);
+
 SchedBase_t schedExGUIStateInitial(sSchedGUI *pGUI, sSchedView *pEntryView,
-                                   SchedHandle_t me, SchedEvent_t const * const e);
+                                   void *me, SchedEvent_t const * const e);
 SchedBase_t schedExGUIStateHandle(sSchedGUI *pGUI, sSchedView *pView,
-                                  SchedHandle_t me, SchedEvent_t const * const e);
+                                  void *me, SchedEvent_t const * const e);
 
 void schedExGUIExternalScanTimer(sSchedGUI *pGUI);
 void schedExGUIExternalUpdateTimer(sSchedGUI *pGUI);

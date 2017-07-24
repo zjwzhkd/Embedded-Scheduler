@@ -7,52 +7,44 @@
 *******************************************************************************/
 
 #include "sched_ex_gui.h"
-#include "sched_api.h"
+
 /*******************************************************************************
 
                                     操作函数
 
 *******************************************************************************/
 /**
- * 初始化GUI控制器
+ * 创建GUI控制器
  *
- * @param pGUI: 待初始化的GUI结构体指针
+ * @param prio: GUI任务优先级
  *
- * @param hGUITask: GUI任务句柄
+ * @param eventLen: 事件缓存区大小
  *
- * @return: 若GUI控制器初始化成功, 返回SCHED_OK,
- *          若初始化过程出现错误, 返回错误代码
+ * @param initial: 初始化伪状态
  *
+ * @param pCreatedGUI: 待创建的GUI控制器指针
+ *
+ * @return: SCHED_OK    控制器创建成功
  */
-eSchedError schedExGUIInit(sSchedGUI *pGUI, SchedHandle_t hGUITask)
+eSchedError schedExGUICreate(SchedPrio_t             prio,
+                             EvtPos_t                eventLen,
+                             SchedEventHandler       initial,
+                             sSchedGUI * const       pCreatedGUI)
 {
-eSchedError ret_err = SCHED_OK;
-
-    pGUI->hGUITask = hGUITask;
-    if (hGUITask == NULL)
-    {
-        ret_err = SCHED_ERR_PARAM;
-    }
+    schedTaskCreate(prio, eventLen, initial, &pCreatedGUI->task);
 
 #if SCHED_EX_GUI_SCAN_TIMER_EN
-    pGUI->hScanTimer = NULL;
-    if (ret_err == SCHED_OK)
-    {
-        ret_err = schedTimerCreate(hGUITask, SCHED_SIG_GUI_SCAN, 0,
-                    SCHED_TIMER_RELOAD, 0, &pGUI->hScanTimer);
-    }
+    schedTimerCreate(&pCreatedGUI->task, SCHED_SIG_GUI_SCAN, 0,
+                SCHED_TIMER_RELOAD, 0, &pCreatedGUI->scanTimer);
+
 #endif
 
 #if SCHED_EX_GUI_UPDATE_TIMER_EN
-    pGUI->hUpdateTimer = NULL;
-    if (ret_err == SCHED_OK)
-    {
-        ret_err = schedTimerCreate(hGUITask, SCHED_SIG_GUI_UPDATE, 0,
-                    SCHED_TIMER_RELOAD, 0, &pGUI->hUpdateTimer);
-    }
+    schedTimerCreate(&pCreatedGUI->task, SCHED_SIG_GUI_UPDATE, 0,
+                SCHED_TIMER_RELOAD, 0, &pCreatedGUI->updateTimer);
 #endif
 
-    return (ret_err);
+    return (SCHED_OK);
 }
 
 /**
@@ -62,17 +54,17 @@ eSchedError ret_err = SCHED_OK;
  *
  * @param pEntryView: 入口视图控制器指针
  *
- * @param me: 状态函数的参数 - 当前任务句柄
+ * @param me: 状态函数的参数 - 当前任务结构体指针
  *
  * @param e:  状态函数的参数 - 当前处理事件
  *
  * @return: 状态函数返回值
  */
 SchedBase_t schedExGUIStateInitial(sSchedGUI *pGUI, sSchedView *pEntryView,
-                                   SchedHandle_t me, SchedEvent_t const * const e)
+                                   void *me, SchedEvent_t const * const e)
 {
-    SCHED_ASSERT(me == pGUI->hGUITask);
-    return schedStateTransfer(me, pEntryView->phy->ViewStateHandler);
+    SCHED_ASSERT(THIS_TASK() == &pGUI->task);
+    return schedStateTransfer(THIS_TASK(), pEntryView->phy->ViewStateHandler);
 }
 
 /**
@@ -82,19 +74,18 @@ SchedBase_t schedExGUIStateInitial(sSchedGUI *pGUI, sSchedView *pEntryView,
  *
  * @param pView: 指定视图控制器指针
  *
- * @param me: 状态函数的参数 - 当前任务句柄
+ * @param me: 状态函数的参数 - 当前任务结构体指针
  *
  * @param e:  状态函数的参数 - 当前处理事件
  *
  * @return: 状态函数返回值
  */
 SchedBase_t schedExGUIStateHandle(sSchedGUI *pGUI, sSchedView *pView,
-                                  SchedHandle_t me, SchedEvent_t const * const e)
+                                  void *me, SchedEvent_t const * const e)
 {
 SchedBase_t ret;
-eSchedError err;
 
-    SCHED_ASSERT(me == pGUI->hGUITask);
+    SCHED_ASSERT(THIS_TASK() == &pGUI->task);
 
     switch (e->sig)
     {
@@ -102,22 +93,16 @@ eSchedError err;
     case SCHED_SIG_ENTRY:
     {
     #if SCHED_EX_GUI_SCAN_TIMER_EN
-        err = schedTimerChangePeriod(pGUI->hScanTimer, pView->phy->scanPeriod);
-        SCHED_ASSERT(err == SCHED_OK);
-        err = schedTimerStart(pGUI->hScanTimer);
-        SCHED_ASSERT(err == SCHED_OK);
+        schedTimerChangePeriod(&pGUI->scanTimer, pView->phy->scanPeriod);
+        schedTimerStart(&pGUI->scanTimer);
     #endif
 
     #if SCHED_EX_GUI_UPDATE_TIMER_EN
-        err = schedTimerChangePeriod(pGUI->hUpdateTimer, pView->phy->updatePeriod);
-        SCHED_ASSERT(err == SCHED_OK);
-        err = schedTimerStart(pGUI->hUpdateTimer);
-        SCHED_ASSERT(err == SCHED_OK);
+        schedTimerChangePeriod(&pGUI->updateTimer, pView->phy->updatePeriod);
+        schedTimerStart(&pGUI->updateTimer);
     #endif
 
-        err = schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_DISPLAY_LOAD, 0);
-        SCHED_ASSERT(err == SCHED_OK);
-        ((void)err);
+        schedEventSend(THIS_TASK(), SCHED_SIG_GUI_DISPLAY_LOAD, 0);
 
         if (pView->phy->Init != 0)
         {
@@ -130,11 +115,11 @@ eSchedError err;
     case SCHED_SIG_EXIT:
     {
     #if SCHED_EX_GUI_SCAN_TIMER_EN
-        schedTimerReset(pGUI->hScanTimer);
+        schedTimerReset(&pGUI->scanTimer);
     #endif
 
     #if SCHED_EX_GUI_UPDATE_TIMER_EN
-        schedTimerReset(pGUI->hUpdateTimer);
+        schedTimerReset(&pGUI->updateTimer);
     #endif
 
         if (pView->phy->Exit != 0)
@@ -163,12 +148,13 @@ eSchedError err;
         if ( action_detect && (pView->phy->Action != 0) )
         {
             view_tran = pView->phy->Action(&action, &target_view);
+            if (view_tran)
+            {
+                SCHED_ASSERT(target_view != NULL);
+                ret = schedStateTransfer(THIS_TASK(), target_view->phy->ViewStateHandler);
+            }
         }
 
-        if (view_tran)
-        {
-            ret = schedStateTransfer(me, target_view->phy->ViewStateHandler);
-        }
         return (ret);
     }
 
@@ -184,7 +170,7 @@ eSchedError err;
 
         if (display_update)
         {
-            schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_DISPLAY_UPDATE, 0);
+            schedEventSend(THIS_TASK(), SCHED_SIG_GUI_DISPLAY_UPDATE, 0);
         }
         return SCHED_HANDLED();
     }
@@ -227,7 +213,7 @@ eSchedError err;
 void schedExGUIExternalScanTimer(sSchedGUI *pGUI)
 {
 #if SCHED_EX_GUI_SCAN_TIMER_EN == 0
-    schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_SCAN, 0);
+    schedEventSend(&pGUI->task, SCHED_SIG_GUI_SCAN, 0);
 #endif
 }
 
@@ -235,18 +221,18 @@ void schedExGUIExternalScanTimer(sSchedGUI *pGUI)
 void schedExGUIExternalUpdateTimer(sSchedGUI *pGUI)
 {
 #if SCHED_EX_GUI_UPDATE_TIMER_EN == 0
-    schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_UPDATE, 0);
+    schedEventSend(&pGUI->task, SCHED_SIG_GUI_UPDATE, 0);
 #endif
 }
 
 /* 加载当前视图显示 */
 void schedExGUIDisplayLoad(sSchedGUI *pGUI)
 {
-    schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_DISPLAY_LOAD, 0);
+    schedEventSend(&pGUI->task, SCHED_SIG_GUI_DISPLAY_LOAD, 0);
 }
 
 /* 更新当前视图显示 */
 void schedExGUIDisplayUpdate(sSchedGUI *pGUI)
 {
-    schedEventSend(pGUI->hGUITask, SCHED_SIG_GUI_DISPLAY_UPDATE, 0);
+    schedEventSend(&pGUI->task, SCHED_SIG_GUI_DISPLAY_UPDATE, 0);
 }
