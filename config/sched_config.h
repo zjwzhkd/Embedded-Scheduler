@@ -110,10 +110,4 @@
  */
 #define SCHED_ASSERT_EN                     ( 1 )
 
-/* 调度器基类对象使能
- * 0 - 禁止基类对象
- * 1 - 使能基类对象
- */
-#define SCHED_BASE_OBJ_EN                   ( 1 )
-
 #endif  /* __SCHED_CONFIG_H */
