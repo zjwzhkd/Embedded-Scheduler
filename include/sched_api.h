@@ -28,6 +28,9 @@ eSchedBool schedHasReadyTask(void);
 
 *******************************************************************************/
 
+#define SCHED_SEC_TO_TICK(_nsec_)   \
+    ( (SchedTick_t)((uint32_t)(_nsec_)*SCHED_TICK_HZ) )
+
 #define SCHED_MS_TO_TICK(_nms_) \
     ( (SchedTick_t)((uint32_t)(_nms_)*SCHED_TICK_HZ/1000) )
 
