@@ -11,13 +11,7 @@
 
 /* 头文件 --------------------------------------------------------------------*/
 #include "sched_prototype.h"
-#include "sched_list.h"
-
-/* 有限状态机 ----------------------------------------------------------------*/
-typedef struct sched_fsm
-{
-    SchedEventHandler       state;
-} sSchedFSM;
+#include "sched_internal_struct.h"
 
 /* 事件缓存 ------------------------------------------------------------------*/
 struct sched_evtbuf;

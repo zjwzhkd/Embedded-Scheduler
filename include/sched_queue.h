@@ -11,18 +11,7 @@
 
 /* 头文件 --------------------------------------------------------------------*/
 #include "sched_prototype.h"
-
-/* 数据类型 ------------------------------------------------------------------*/
-/* 事件队列 */
-typedef struct sched_queue
-{
-    EvtPos_t            in;
-    EvtPos_t            out;
-    EvtPos_t            total;
-    EvtPos_t            count;
-    size_t              esize;
-    uint8_t             buf[];
-} sSchedQueue;
+#include "sched_internal_struct.h"
 
 /* 宏定义 --------------------------------------------------------------------*/
 /*
