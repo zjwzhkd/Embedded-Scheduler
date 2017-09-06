@@ -7,6 +7,7 @@
 *******************************************************************************/
 
 #include "sched_timer.h"
+#include "sched_internal.h"
 #include "sched_core.h"
 #include "sched_tick.h"
 #include "sched_task.h"

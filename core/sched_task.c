@@ -7,8 +7,7 @@
 *******************************************************************************/
 
 #include "sched_task.h"
-#include "sched_fsm.h"
-#include "sched_list.h"
+#include "sched_internal.h"
 #include "sched_core.h"
 #include "sched_evtbuf.h"
 #include "sched_api.h"

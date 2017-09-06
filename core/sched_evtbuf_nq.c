@@ -8,6 +8,7 @@
 *******************************************************************************/
 
 #include "sched_evtbuf.h"
+#include "sched_internal.h"
 
 #if SCHED_EVTBUF_QUEUE_EN == 0
 
