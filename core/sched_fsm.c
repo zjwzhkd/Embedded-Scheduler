@@ -26,13 +26,13 @@ static const SchedEvent_t internal_event[3] =
 
 *******************************************************************************/
 /* 构造有限状态机 */
-void schedFSMCtor(sSchedFSM *fsm, SchedEventHandler initial)
+void schedIntFSMCtor(sSchedFSM *fsm, SchedEventHandler initial)
 {
     fsm->state = initial;
 }
 
 /* 初始化状态机, 实现初始化状态转移 */
-void schedFSMInit(sSchedFSM *fsm, void *me)
+void schedIntFSMInit(sSchedFSM *fsm, void *me)
 {
 SchedBase_t ret;
 
@@ -46,7 +46,7 @@ SchedBase_t ret;
 }
 
 /* 状态机处理事件 */
-void schedFSMDispatch(sSchedFSM *fsm, void *me, SchedEvent_t const *e)
+void schedIntFSMDispatch(sSchedFSM *fsm, void *me, SchedEvent_t const *e)
 {
 SchedEventHandler tmp;
 SchedBase_t ret;

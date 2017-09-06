@@ -136,8 +136,8 @@ eSchedBool schedIntQueueIsFull(sSchedQueue *queue);
 
 *******************************************************************************/
 /* 状态机函数 ----------------------------------------------------------------*/
-void schedFSMCtor(sSchedFSM *fsm, SchedEventHandler initial);
-void schedFSMInit(sSchedFSM *fsm, void *me);
-void schedFSMDispatch(sSchedFSM *fsm, void *me, SchedEvent_t const *e);
+void schedIntFSMCtor(sSchedFSM *fsm, SchedEventHandler initial);
+void schedIntFSMInit(sSchedFSM *fsm, void *me);
+void schedIntFSMDispatch(sSchedFSM *fsm, void *me, SchedEvent_t const *e);
 
 #endif  /* __SCHED_INTERNAL_H */

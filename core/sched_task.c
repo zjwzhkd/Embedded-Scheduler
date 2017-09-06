@@ -87,7 +87,7 @@ eSchedBool evtbuf_init;
     SCHED_ASSERT( SCHED_CORE_IS_STOPPED() );
 
     /* 初始化任务管理结构体 */
-    schedFSMCtor(&pCreatedTask->fsm, initial);
+    schedIntFSMCtor(&pCreatedTask->fsm, initial);
     schedIntListInit(&pCreatedTask->prio);
     SCHED_LIST_SET_VALUE(&pCreatedTask->prio, prio);
     evtbuf_init = schedEvtbufInit(&pCreatedTask->evtbuf, eventLen);
@@ -313,7 +313,7 @@ sSchedTask *task;
     SCHED_LIST_FOR_EACH(pos, &readyTaskList)
     {
         task = SCHED_LIST_ENTRY(pos, sSchedTask, prio);
-        schedFSMInit(&task->fsm, task);
+        schedIntFSMInit(&task->fsm, task);
     }
 }
 
@@ -347,7 +347,7 @@ SchedEvent_t event;
     /* 任务状态机处理事件 */
     if ( task_exec )
     {
-        schedFSMDispatch(&task->fsm, task, &event);
+        schedIntFSMDispatch(&task->fsm, task, &event);
     }
 
     /* 轮转就绪任务 */
