@@ -1,13 +1,13 @@
 /*******************************************************************************
-* 文 件 名: sched_proto.h
+* 文 件 名: sched_prototype.h
 * 创 建 者: Keda Huang
 * 版    本: V1.0
 * 创建日期: 2016-11-14
 * 文件说明: 事件驱动调度器的原型定义
 *******************************************************************************/
 
-#ifndef __SCHED_PROTO_H
-#define __SCHED_PROTO_H
+#ifndef __SCHED_PROTOTYPE_H
+#define __SCHED_PROTOTYPE_H
 
 /* 头文件 --------------------------------------------------------------------*/
 #include <stdint.h>
@@ -73,4 +73,4 @@ enum {
 #define SCHED_RET_IGNORED       ( (SchedBase_t)1 )
 #define SCHED_RET_TRAN          ( (SchedBase_t)2 )
 
-#endif  /* __SCHED_PROTO_H */
+#endif  /* __SCHED_PROTOTYPE_H */

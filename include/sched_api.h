@@ -9,7 +9,7 @@
 #ifndef __SCHED_API_H
 #define __SCHED_API_H
 
-#include "sched_proto.h"
+#include "sched_prototype.h"
 #include "sched_core_struct.h"
 
 /*******************************************************************************

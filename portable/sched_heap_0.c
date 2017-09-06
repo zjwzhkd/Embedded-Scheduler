@@ -6,7 +6,7 @@
 * 文件说明: 动态内存分配 -- 实现无效的动态内存分配
 *******************************************************************************/
 
-#include "sched_proto.h"
+#include "sched_prototype.h"
 
 void schedPortHeapInit(void)
 {

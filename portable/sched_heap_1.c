@@ -6,7 +6,7 @@
 * 文件说明: 动态内存分配 -- 封装C标准库的动态内存分配函数
 *******************************************************************************/
 
-#include "sched_proto.h"
+#include "sched_prototype.h"
 #include <stdlib.h>
 
 void schedPortHeapInit(void)

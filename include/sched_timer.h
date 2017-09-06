@@ -10,7 +10,7 @@
 #define __SCHED_TIMER_H
 
 /* 头文件 --------------------------------------------------------------------*/
-#include "sched_proto.h"
+#include "sched_prototype.h"
 #include "sched_core_struct.h"
 
 /* 定时器管理 ----------------------------------------------------------------*/

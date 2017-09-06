@@ -10,7 +10,7 @@
 #define __SCHED_TICK_H
 
 /* 头文件 --------------------------------------------------------------------*/
-#include "sched_proto.h"
+#include "sched_prototype.h"
 #include "sched_list.h"
 #include "sched_core_struct.h"
 
