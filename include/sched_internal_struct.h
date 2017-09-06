@@ -20,6 +20,12 @@ typedef struct sched_list
     SchedTick_t         value;  /* 链表项排序值   */
 } sSchedList;
 
+/* 通过结构体成员变量指针来获得结构体指针 */
+#ifndef container_of
+    #define container_of(ptr, type, member) \
+        ( (type *)((char *)(ptr) - offsetof(type, member)) )
+#endif
+
 /* 优先级记录表 --------------------------------------------------------------*/
 typedef struct sched_priotbl
 {
