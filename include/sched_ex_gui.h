@@ -136,9 +136,12 @@ enum {
     __SCHED_VIEW_DEFINE(_view_, &__SCHED_VIEW_PHY(_view_))
 
 
+/* GUI任务 */
+#define SCHED_GUI_TASK(_pGUI_)  ( (sSchedTask *)(_pGUI_) )
+
 /* 视图切换 */
 #define SCHED_TRAN_VIEW(_pTargetView_)  \
-    ( SCHED_TRAN((_pTargetView_)->ViewStateHandler) )
+    ( SCHED_TRAN((_pTargetView_)->phy->ViewStateHandler) )
 
 /* GUI操作函数 ---------------------------------------------------------------*/
 eSchedError schedExGUICreate(SchedPrio_t             prio,
