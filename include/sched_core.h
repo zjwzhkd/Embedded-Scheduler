@@ -19,7 +19,7 @@ typedef enum
 
 extern eSchedCoreState schedCoreCurrentState;
 
-#define SCHED_CURRENT_STATE()       ( schedCoreCurrentState )
+#define SCHED_CORE_STATE()          ( schedCoreCurrentState )
 #define SCHED_CORE_IS_RUNNING()     ( schedCoreCurrentState == SCHED_CORE_RUNNING )
 #define SCHED_CORE_IS_STOPPED()     ( schedCoreCurrentState == SCHED_CORE_STOP )
 
