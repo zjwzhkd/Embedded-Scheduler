@@ -49,6 +49,9 @@ SchedTick_t schedTickGetCountFromISR(void);
 #define SCHED_STATE_FUNCTION(_func_)    \
     SchedBase_t _func_(void *me, SchedEvent_t const * const e)
 
+#define SCHED_TASK_STATE(_pTask_)   \
+    ( (_pTask_)->fsm.state )
+
 #define THIS_TASK()             ( (sSchedTask *) me )
 #define EVT_SIG()               ( e->sig )
 #define EVT_MSG()               ( e->msg )
